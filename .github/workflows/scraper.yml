@@ -11,15 +11,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Iniciar FlareSolverr
+        run: |
+          docker pull ghcr.io/flaresolverr/flaresolverr:latest
+          docker run -d --name flaresolverr \
+            -p 8191:8191 \
+            -e LOG_LEVEL=info \
+            ghcr.io/flaresolverr/flaresolverr:latest
+          echo "Aguardando FlareSolverr..."
+          for i in $(seq 1 20); do
+            if curl -s http://localhost:8191/ | grep -q "FlareSolverr"; then
+              echo "FlareSolverr pronto."
+              break
+            fi
+            sleep 2
+          done
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Instalar dependências
         run: pip install -r scraper/requirements.txt
-
-      - name: Instalar Chromium (Playwright)
-        run: python -m playwright install chromium --with-deps
 
       - name: Rodar scraper
         env:
