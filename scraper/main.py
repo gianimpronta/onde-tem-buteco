@@ -16,12 +16,11 @@ SLEEP = 0.5
 def get_slugs(page_obj: Page, page: int) -> list[str]:
     url = f"{BASE_URL}/butecos/page/{page}/"
     try:
-        response = page_obj.goto(url, timeout=30000, wait_until="domcontentloaded")
-        if not response or not response.ok:
-            print(f"  HTTP {response.status if response else '?'} para página {page}")
-            return []
+        page_obj.goto(url, timeout=30000, wait_until="networkidle")
+        # Verifica se carregou conteúdo real (não página de erro)
+        page_obj.wait_for_selector("a[href*='/buteco/']", timeout=10000)
     except Exception as e:
-        print(f"  erro ao buscar página {page}: {e}")
+        print(f"  sem conteúdo na página {page}: {e}")
         return []
 
     html = page_obj.content()
@@ -42,10 +41,8 @@ def get_slugs(page_obj: Page, page: int) -> list[str]:
 def scrape_buteco(page_obj: Page, slug: str) -> dict:
     url = f"{BASE_URL}/buteco/{slug}/"
     try:
-        response = page_obj.goto(url, timeout=30000, wait_until="domcontentloaded")
-        if not response or not response.ok:
-            print(f"  HTTP {response.status if response else '?'} para {slug}")
-            return {}
+        page_obj.goto(url, timeout=30000, wait_until="networkidle")
+        page_obj.wait_for_selector("h1.section-title", timeout=10000)
     except Exception as e:
         print(f"  erro ao buscar {slug}: {e}")
         return {}
