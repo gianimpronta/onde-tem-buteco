@@ -58,7 +58,7 @@ def scrape_buteco(slug: str) -> dict:
     nome = nome_tag.get_text(strip=True) if nome_tag else ""
 
     foto_tag = soup.select_one("img.img-single")
-    foto_url = foto_tag["src"] if foto_tag else None
+    foto_url = (foto_tag.get("src") or foto_tag.get("data-src")) if foto_tag else None
 
     section = soup.select_one(".section-text")
     petisco_nome = None
@@ -151,33 +151,35 @@ def main() -> None:
     total = 0
     errors = 0
 
-    while True:
-        print(f"\n[página {page}] buscando slugs...")
-        slugs = get_slugs(page)
-        if not slugs:
-            print(f"  sem resultados — fim da paginação.")
-            break
+    try:
+        while True:
+            print(f"\n[página {page}] buscando slugs...")
+            slugs = get_slugs(page)
+            if not slugs:
+                print(f"  sem resultados — fim da paginação.")
+                break
 
-        for slug in slugs:
+            for slug in slugs:
+                time.sleep(SLEEP)
+                data = scrape_buteco(slug)
+                if not data:
+                    print(f"  {slug} → erro (sem dados)")
+                    errors += 1
+                    continue
+                try:
+                    upsert_buteco(conn, data)
+                    print(f"  {slug} → ok")
+                    total += 1
+                except Exception as e:
+                    print(f"  {slug} → erro no banco: {e}")
+                    conn.rollback()
+                    errors += 1
+
+            page += 1
             time.sleep(SLEEP)
-            data = scrape_buteco(slug)
-            if not data:
-                print(f"  {slug} → erro (sem dados)")
-                errors += 1
-                continue
-            try:
-                upsert_buteco(conn, data)
-                print(f"  {slug} → ok")
-                total += 1
-            except Exception as e:
-                print(f"  {slug} → erro no banco: {e}")
-                conn.rollback()
-                errors += 1
+    finally:
+        conn.close()
 
-        page += 1
-        time.sleep(SLEEP)
-
-    conn.close()
     print(f"\nConcluído: {total} butecos inseridos/atualizados, {errors} erros.")
 
 
