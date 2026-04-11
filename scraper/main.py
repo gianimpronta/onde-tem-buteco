@@ -38,33 +38,36 @@ def new_stealth_page(browser):
     return page
 
 
-def _debug_page(page_obj: Page) -> None:
-    print(f"  DEBUG url={page_obj.url}")
-    print(f"  DEBUG title={page_obj.title()!r}")
-    snippet = page_obj.content()[:300].replace("\n", " ")
-    print(f"  DEBUG html={snippet!r}")
-
-
-def _wait_content(page_obj: Page, selector: str, label: str) -> bool:
-    """Navigate and wait for selector, with debug on failure."""
+def navigate(page_obj: Page, url: str, selector: str) -> bool:
+    """Navigate to URL, wait through Cloudflare challenge if needed, then find selector."""
     try:
-        page_obj.wait_for_selector(selector, timeout=30000)
+        page_obj.goto(url, timeout=60000)
+    except Exception as e:
+        print(f"  goto falhou: {e}")
+        return False
+
+    # If Cloudflare challenge page, wait up to 30s for it to resolve
+    if page_obj.title() == "Just a moment...":
+        try:
+            page_obj.wait_for_function(
+                "() => document.title !== 'Just a moment...'",
+                timeout=30000,
+            )
+        except Exception:
+            print(f"  Cloudflare não resolveu em {url}")
+            return False
+
+    try:
+        page_obj.wait_for_selector(selector, timeout=15000)
         return True
     except Exception:
-        _debug_page(page_obj)
-        print(f"  seletor '{selector}' não encontrado em {label}")
+        print(f"  seletor '{selector}' não encontrado | título={page_obj.title()!r} | url={page_obj.url}")
         return False
 
 
 def get_slugs(page_obj: Page, page: int) -> list[str]:
     url = f"{BASE_URL}/butecos/page/{page}/"
-    try:
-        page_obj.goto(url, timeout=60000)
-    except Exception as e:
-        print(f"  goto falhou para página {page}: {e}")
-        return []
-
-    if not _wait_content(page_obj, "a[href*='/buteco/']", f"página {page}"):
+    if not navigate(page_obj, url, "a[href*='/buteco/']"):
         return []
 
     html = page_obj.content()
@@ -84,13 +87,7 @@ def get_slugs(page_obj: Page, page: int) -> list[str]:
 
 def scrape_buteco(page_obj: Page, slug: str) -> dict:
     url = f"{BASE_URL}/buteco/{slug}/"
-    try:
-        page_obj.goto(url, timeout=60000)
-    except Exception as e:
-        print(f"  goto falhou para {slug}: {e}")
-        return {}
-
-    if not _wait_content(page_obj, "h1.section-title", slug):
+    if not navigate(page_obj, url, "h1.section-title"):
         return {}
 
     html = page_obj.content()
