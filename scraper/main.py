@@ -46,7 +46,7 @@ def navigate(page_obj: Page, url: str, selector: str) -> bool:
         print(f"  goto falhou: {e}")
         return False
 
-    # If Cloudflare challenge page, wait up to 30s for it to resolve
+    # If Cloudflare challenge page, wait for it to resolve
     if page_obj.title() == "Just a moment...":
         try:
             page_obj.wait_for_function(
@@ -54,14 +54,18 @@ def navigate(page_obj: Page, url: str, selector: str) -> bool:
                 timeout=30000,
             )
         except Exception:
-            print(f"  Cloudflare não resolveu em {url}")
-            return False
+            # Exception may mean the challenge resolved via fast JS redirect
+            # (execution context destroyed). Wait for the new page to settle.
+            try:
+                page_obj.wait_for_load_state("load", timeout=15000)
+            except Exception:
+                pass
 
     try:
         page_obj.wait_for_selector(selector, timeout=15000)
         return True
     except Exception:
-        print(f"  seletor '{selector}' não encontrado | título={page_obj.title()!r} | url={page_obj.url}")
+        print(f"  falhou | título={page_obj.title()!r} | url={page_obj.url}")
         return False
 
 
