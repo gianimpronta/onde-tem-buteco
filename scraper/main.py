@@ -44,7 +44,71 @@ def get_slugs(page: int) -> list[str]:
 
 
 def scrape_buteco(slug: str) -> dict:
-    pass
+    url = f"{BASE_URL}/buteco/{slug}/"
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=10)
+        resp.raise_for_status()
+    except requests.RequestException as e:
+        print(f"  erro ao buscar {slug}: {e}")
+        return {}
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+
+    nome_tag = soup.select_one("h1.section-title")
+    nome = nome_tag.get_text(strip=True) if nome_tag else ""
+
+    foto_tag = soup.select_one("img.img-single")
+    foto_url = foto_tag["src"] if foto_tag else None
+
+    section = soup.select_one(".section-text")
+    petisco_nome = None
+    petisco_desc = None
+    endereco = None
+    telefone = None
+    horario = None
+
+    if section:
+        paragraphs = section.find_all("p")
+        for i, p in enumerate(paragraphs):
+            bold = p.find("b")
+            if not bold:
+                continue
+            label = bold.get_text(strip=True).lower().rstrip(":")
+            value = p.get_text(strip=True)[len(bold.get_text(strip=True)):].strip().lstrip(":").strip()
+
+            if label == "endereço" or label == "endereco":
+                endereco = value
+            elif label == "telefone":
+                telefone = value
+            elif label in ("horario", "horário"):
+                horario = value
+            elif i == 0:
+                petisco_nome = bold.get_text(strip=True)
+                petisco_desc = value if value else None
+
+    cidade = None
+    bairro = None
+    if endereco:
+        parts = [p.strip() for p in endereco.split(",")]
+        # Remove estado (UF) se presente na última parte
+        last = parts[-1].strip()
+        if re.match(r"^[A-Z]{2}$", last):
+            parts = parts[:-1]
+        cidade = parts[-1].strip() if parts else None
+        bairro = parts[-2].strip() if len(parts) >= 2 else None
+
+    return {
+        "slug": slug,
+        "nome": nome,
+        "cidade": cidade or "",
+        "bairro": bairro,
+        "endereco": endereco or "",
+        "telefone": telefone,
+        "horario": horario,
+        "petisco_nome": petisco_nome,
+        "petisco_desc": petisco_desc,
+        "foto_url": foto_url,
+    }
 
 
 def upsert_buteco(conn, data: dict) -> None:
