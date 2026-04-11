@@ -46,20 +46,21 @@ def navigate(page_obj: Page, url: str, selector: str) -> bool:
         print(f"  goto falhou: {e}")
         return False
 
-    # If Cloudflare challenge page, wait for it to resolve
+    # If Cloudflare challenge page, poll until title changes (up to 35s)
     if page_obj.title() == "Just a moment...":
-        try:
-            page_obj.wait_for_function(
-                "() => document.title !== 'Just a moment...'",
-                timeout=30000,
-            )
-        except Exception:
-            # Exception may mean the challenge resolved via fast JS redirect
-            # (execution context destroyed). Wait for the new page to settle.
+        deadline = time.time() + 35
+        resolved = False
+        while time.time() < deadline:
             try:
-                page_obj.wait_for_load_state("load", timeout=15000)
+                if page_obj.title() != "Just a moment...":
+                    resolved = True
+                    break
             except Exception:
                 pass
+            time.sleep(0.5)
+        if not resolved:
+            print(f"  Cloudflare não resolveu: {url}")
+            return False
 
     try:
         page_obj.wait_for_selector(selector, timeout=15000)
