@@ -140,7 +140,45 @@ def upsert_buteco(conn, data: dict) -> None:
 
 
 def main() -> None:
-    pass
+    db_url = os.environ.get("POSTGRES_URL_NON_POOLING")
+    if not db_url:
+        raise RuntimeError("POSTGRES_URL_NON_POOLING não definida")
+
+    conn = psycopg2.connect(db_url)
+    print("Conectado ao banco.")
+
+    page = 1
+    total = 0
+    errors = 0
+
+    while True:
+        print(f"\n[página {page}] buscando slugs...")
+        slugs = get_slugs(page)
+        if not slugs:
+            print(f"  sem resultados — fim da paginação.")
+            break
+
+        for slug in slugs:
+            time.sleep(SLEEP)
+            data = scrape_buteco(slug)
+            if not data:
+                print(f"  {slug} → erro (sem dados)")
+                errors += 1
+                continue
+            try:
+                upsert_buteco(conn, data)
+                print(f"  {slug} → ok")
+                total += 1
+            except Exception as e:
+                print(f"  {slug} → erro no banco: {e}")
+                conn.rollback()
+                errors += 1
+
+        page += 1
+        time.sleep(SLEEP)
+
+    conn.close()
+    print(f"\nConcluído: {total} butecos inseridos/atualizados, {errors} erros.")
 
 
 if __name__ == "__main__":
