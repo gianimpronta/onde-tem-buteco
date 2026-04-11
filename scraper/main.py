@@ -13,12 +13,21 @@ BASE_URL = "https://comidadibuteco.com.br"
 SLEEP = 0.5
 
 
+def new_page(browser):
+    page = browser.new_page()
+    try:
+        from playwright_stealth import stealth_sync
+        stealth_sync(page)
+    except ImportError:
+        pass
+    return page
+
+
 def get_slugs(page_obj: Page, page: int) -> list[str]:
     url = f"{BASE_URL}/butecos/page/{page}/"
     try:
-        page_obj.goto(url, timeout=30000, wait_until="networkidle")
-        # Verifica se carregou conteúdo real (não página de erro)
-        page_obj.wait_for_selector("a[href*='/buteco/']", timeout=10000)
+        page_obj.goto(url, timeout=60000)
+        page_obj.wait_for_selector("a[href*='/buteco/']", timeout=30000)
     except Exception as e:
         print(f"  sem conteúdo na página {page}: {e}")
         return []
@@ -41,8 +50,8 @@ def get_slugs(page_obj: Page, page: int) -> list[str]:
 def scrape_buteco(page_obj: Page, slug: str) -> dict:
     url = f"{BASE_URL}/buteco/{slug}/"
     try:
-        page_obj.goto(url, timeout=30000, wait_until="networkidle")
-        page_obj.wait_for_selector("h1.section-title", timeout=10000)
+        page_obj.goto(url, timeout=60000)
+        page_obj.wait_for_selector("h1.section-title", timeout=30000)
     except Exception as e:
         print(f"  erro ao buscar {slug}: {e}")
         return {}
@@ -149,7 +158,7 @@ def main() -> None:
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            page_obj = browser.new_page()
+            page_obj = new_page(browser)
 
             while True:
                 print(f"\n[página {page_num}] buscando slugs...")
