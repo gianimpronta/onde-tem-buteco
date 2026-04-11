@@ -29,7 +29,7 @@ devem ser alterados manualmente no banco.
 
 | Camada | Tecnologia |
 |---|---|
-| Framework | Next.js 15 (App Router) + TypeScript |
+| Framework | Next.js 16 (App Router) + TypeScript |
 | Estilização | Tailwind CSS |
 | ORM | Prisma |
 | Banco de dados | Vercel Postgres (Neon) |
@@ -227,7 +227,7 @@ docs: atualiza CLAUDE.md com instruções do scraper
 ## Fases do MVP
 
 ### Fase 1 — Dados ✅ (base)
-- [ ] Setup Next.js 15 + TypeScript + Tailwind + Prisma
+- [ ] Setup Next.js 16 + TypeScript + Tailwind + Prisma
 - [ ] Configurar Vercel Postgres
 - [ ] Rodar scraper manualmente para popular o banco
 - [ ] Migrations iniciais
