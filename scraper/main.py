@@ -112,7 +112,31 @@ def scrape_buteco(slug: str) -> dict:
 
 
 def upsert_buteco(conn, data: dict) -> None:
-    pass
+    sql = """
+        INSERT INTO "Buteco" (
+            id, slug, nome, cidade, bairro, endereco,
+            telefone, horario, "petiscoNome", "petiscoDesc",
+            "fotoUrl", lat, lng, "createdAt", "updatedAt"
+        ) VALUES (
+            gen_random_uuid()::text, %(slug)s, %(nome)s, %(cidade)s, %(bairro)s, %(endereco)s,
+            %(telefone)s, %(horario)s, %(petisco_nome)s, %(petisco_desc)s,
+            %(foto_url)s, NULL, NULL, NOW(), NOW()
+        )
+        ON CONFLICT (slug) DO UPDATE SET
+            nome          = EXCLUDED.nome,
+            cidade        = EXCLUDED.cidade,
+            bairro        = EXCLUDED.bairro,
+            endereco      = EXCLUDED.endereco,
+            telefone      = EXCLUDED.telefone,
+            horario       = EXCLUDED.horario,
+            "petiscoNome" = EXCLUDED."petiscoNome",
+            "petiscoDesc" = EXCLUDED."petiscoDesc",
+            "fotoUrl"     = EXCLUDED."fotoUrl",
+            "updatedAt"   = NOW()
+    """
+    with conn.cursor() as cur:
+        cur.execute(sql, data)
+    conn.commit()
 
 
 def main() -> None:
