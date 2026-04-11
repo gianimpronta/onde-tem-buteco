@@ -12,9 +12,24 @@ load_dotenv()
 BASE_URL = "https://comidadibuteco.com.br"
 SLEEP = 0.5
 
+BROWSER_ARGS = [
+    "--disable-blink-features=AutomationControlled",
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+]
 
-def new_page(browser):
-    page = browser.new_page()
+UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/131.0.0.0 Safari/537.36"
+)
+
+
+def new_stealth_page(browser):
+    page = browser.new_page(
+        user_agent=UA,
+        viewport={"width": 1920, "height": 1080},
+    )
     try:
         from playwright_stealth import stealth_sync
         stealth_sync(page)
@@ -23,13 +38,33 @@ def new_page(browser):
     return page
 
 
+def _debug_page(page_obj: Page) -> None:
+    print(f"  DEBUG url={page_obj.url}")
+    print(f"  DEBUG title={page_obj.title()!r}")
+    snippet = page_obj.content()[:300].replace("\n", " ")
+    print(f"  DEBUG html={snippet!r}")
+
+
+def _wait_content(page_obj: Page, selector: str, label: str) -> bool:
+    """Navigate and wait for selector, with debug on failure."""
+    try:
+        page_obj.wait_for_selector(selector, timeout=30000)
+        return True
+    except Exception:
+        _debug_page(page_obj)
+        print(f"  seletor '{selector}' não encontrado em {label}")
+        return False
+
+
 def get_slugs(page_obj: Page, page: int) -> list[str]:
     url = f"{BASE_URL}/butecos/page/{page}/"
     try:
         page_obj.goto(url, timeout=60000)
-        page_obj.wait_for_selector("a[href*='/buteco/']", timeout=30000)
     except Exception as e:
-        print(f"  sem conteúdo na página {page}: {e}")
+        print(f"  goto falhou para página {page}: {e}")
+        return []
+
+    if not _wait_content(page_obj, "a[href*='/buteco/']", f"página {page}"):
         return []
 
     html = page_obj.content()
@@ -51,9 +86,11 @@ def scrape_buteco(page_obj: Page, slug: str) -> dict:
     url = f"{BASE_URL}/buteco/{slug}/"
     try:
         page_obj.goto(url, timeout=60000)
-        page_obj.wait_for_selector("h1.section-title", timeout=30000)
     except Exception as e:
-        print(f"  erro ao buscar {slug}: {e}")
+        print(f"  goto falhou para {slug}: {e}")
+        return {}
+
+    if not _wait_content(page_obj, "h1.section-title", slug):
         return {}
 
     html = page_obj.content()
@@ -157,8 +194,8 @@ def main() -> None:
 
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page_obj = new_page(browser)
+            browser = p.chromium.launch(headless=True, args=BROWSER_ARGS)
+            page_obj = new_stealth_page(browser)
 
             while True:
                 print(f"\n[página {page_num}] buscando slugs...")
