@@ -1,7 +1,7 @@
 import os
 import time
 import re
-import requests
+from curl_cffi import requests
 import psycopg2
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -20,7 +20,7 @@ SLEEP = 0.5
 def get_slugs(page: int) -> list[str]:
     url = f"{BASE_URL}/butecos/page/{page}/"
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=10)
+        resp = requests.get(url, headers=HEADERS, timeout=10, impersonate="chrome120")
     except requests.RequestException as e:
         print(f"  erro ao buscar página {page}: {e}")
         return []
@@ -46,7 +46,7 @@ def get_slugs(page: int) -> list[str]:
 def scrape_buteco(slug: str) -> dict:
     url = f"{BASE_URL}/buteco/{slug}/"
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=10)
+        resp = requests.get(url, headers=HEADERS, timeout=10, impersonate="chrome120")
         resp.raise_for_status()
     except requests.RequestException as e:
         print(f"  erro ao buscar {slug}: {e}")
