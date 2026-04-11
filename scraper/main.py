@@ -2,83 +2,67 @@ import os
 import sys
 import time
 import re
+import requests
 import psycopg2
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-from playwright.sync_api import sync_playwright, Page
 
 load_dotenv()
 
 BASE_URL = "https://comidadibuteco.com.br"
-SLEEP = 0.5
-
-BROWSER_ARGS = [
-    "--disable-blink-features=AutomationControlled",
-    "--no-sandbox",
-    "--disable-dev-shm-usage",
-]
-
-UA = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/131.0.0.0 Safari/537.36"
-)
+FLARESOLVERR = "http://localhost:8191/v1"
+SLEEP = 1.0
+SESSION_ID = "scraper-session"
 
 
-def new_stealth_page(browser):
-    page = browser.new_page(
-        user_agent=UA,
-        viewport={"width": 1920, "height": 1080},
-    )
+def fs_request(url: str) -> str:
+    """Fetch a URL via FlareSolverr. Returns HTML or empty string on failure."""
     try:
-        from playwright_stealth import stealth_sync
-        stealth_sync(page)
-    except ImportError:
-        pass
-    return page
-
-
-def navigate(page_obj: Page, url: str, selector: str) -> bool:
-    """Navigate to URL, wait through Cloudflare challenge if needed, then find selector."""
-    try:
-        page_obj.goto(url, timeout=60000)
+        resp = requests.post(
+            FLARESOLVERR,
+            json={
+                "cmd": "request.get",
+                "url": url,
+                "session": SESSION_ID,
+                "maxTimeout": 60000,
+            },
+            timeout=90,
+        )
+        data = resp.json()
+        if data.get("status") == "ok":
+            return data["solution"]["response"]
+        print(f"  FlareSolverr erro: {data.get('message', data.get('status'))}")
+        return ""
     except Exception as e:
-        print(f"  goto falhou: {e}")
-        return False
+        print(f"  FlareSolverr exceção: {e}")
+        return ""
 
-    # If Cloudflare challenge page, poll until title changes (up to 35s)
-    if page_obj.title() == "Just a moment...":
-        deadline = time.time() + 35
-        resolved = False
-        while time.time() < deadline:
-            try:
-                if page_obj.title() != "Just a moment...":
-                    resolved = True
-                    break
-            except Exception:
-                pass
-            time.sleep(0.5)
-        if not resolved:
-            print(f"  Cloudflare não resolveu: {url}")
-            return False
 
+def fs_create_session() -> None:
+    """Create a persistent FlareSolverr session (reuses cookies across requests)."""
     try:
-        page_obj.wait_for_selector(selector, timeout=15000)
-        return True
+        requests.post(
+            FLARESOLVERR,
+            json={"cmd": "sessions.create", "session": SESSION_ID},
+            timeout=15,
+        )
     except Exception:
-        print(f"  falhou | título={page_obj.title()!r} | url={page_obj.url}")
-        return False
+        pass
 
 
-def get_slugs(page_obj: Page, page: int) -> list[str]:
+def get_slugs(page: int) -> list[str]:
     url = f"{BASE_URL}/butecos/page/{page}/"
-    if not navigate(page_obj, url, "a[href*='/buteco/']"):
+    html = fs_request(url)
+    if not html:
         return []
 
-    html = page_obj.content()
     soup = BeautifulSoup(html, "html.parser")
-    seen = set()
-    slugs = []
+    if not soup.select_one("a[href*='/buteco/']"):
+        print(f"  sem links de buteco na página {page} (possível bloqueio ou fim)")
+        return []
+
+    seen: set[str] = set()
+    slugs: list[str] = []
     for a in soup.select("a[href*='/buteco/']"):
         href = a.get("href", "")
         match = re.search(r"/buteco/([^/]+)/?$", href)
@@ -90,16 +74,19 @@ def get_slugs(page_obj: Page, page: int) -> list[str]:
     return slugs
 
 
-def scrape_buteco(page_obj: Page, slug: str) -> dict:
+def scrape_buteco(slug: str) -> dict:
     url = f"{BASE_URL}/buteco/{slug}/"
-    if not navigate(page_obj, url, "h1.section-title"):
+    html = fs_request(url)
+    if not html:
         return {}
 
-    html = page_obj.content()
     soup = BeautifulSoup(html, "html.parser")
-
     nome_tag = soup.select_one("h1.section-title")
-    nome = nome_tag.get_text(strip=True) if nome_tag else ""
+    if not nome_tag:
+        print(f"  h1.section-title não encontrado em {slug}")
+        return {}
+
+    nome = nome_tag.get_text(strip=True)
 
     foto_tag = soup.select_one("img.img-single")
     foto_url = (foto_tag.get("src") or foto_tag.get("data-src")) if foto_tag else None
@@ -190,45 +177,40 @@ def main() -> None:
     conn = psycopg2.connect(db_url)
     print("Conectado ao banco.")
 
+    fs_create_session()
+    print("Sessão FlareSolverr criada.")
+
     page_num = 1
     total = 0
     errors = 0
 
-    try:
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True, args=BROWSER_ARGS)
-            page_obj = new_stealth_page(browser)
+    while True:
+        print(f"\n[página {page_num}] buscando slugs...")
+        slugs = get_slugs(page_num)
+        if not slugs:
+            print("  sem resultados — fim da paginação.")
+            break
 
-            while True:
-                print(f"\n[página {page_num}] buscando slugs...")
-                slugs = get_slugs(page_obj, page_num)
-                if not slugs:
-                    print("  sem resultados — fim da paginação.")
-                    break
+        for slug in slugs:
+            time.sleep(SLEEP)
+            data = scrape_buteco(slug)
+            if not data:
+                print(f"  {slug} → erro (sem dados)")
+                errors += 1
+                continue
+            try:
+                upsert_buteco(conn, data)
+                print(f"  {slug} → ok")
+                total += 1
+            except Exception as e:
+                print(f"  {slug} → erro no banco: {e}")
+                conn.rollback()
+                errors += 1
 
-                for slug in slugs:
-                    time.sleep(SLEEP)
-                    data = scrape_buteco(page_obj, slug)
-                    if not data:
-                        print(f"  {slug} → erro (sem dados)")
-                        errors += 1
-                        continue
-                    try:
-                        upsert_buteco(conn, data)
-                        print(f"  {slug} → ok")
-                        total += 1
-                    except Exception as e:
-                        print(f"  {slug} → erro no banco: {e}")
-                        conn.rollback()
-                        errors += 1
+        page_num += 1
+        time.sleep(SLEEP)
 
-                page_num += 1
-                time.sleep(SLEEP)
-
-            browser.close()
-    finally:
-        conn.close()
-
+    conn.close()
     print(f"\nConcluído: {total} butecos inseridos/atualizados, {errors} erros.")
 
     if total == 0 and errors > 0:
