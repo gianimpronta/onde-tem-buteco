@@ -1,39 +1,35 @@
 import os
+import sys
 import time
 import re
-from curl_cffi import requests
 import psycopg2
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+from playwright.sync_api import sync_playwright, Page
 
 load_dotenv()
 
 BASE_URL = "https://comidadibuteco.com.br"
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "pt-BR,pt;q=0.9",
-}
 SLEEP = 0.5
 
 
-def get_slugs(page: int) -> list[str]:
+def get_slugs(page_obj: Page, page: int) -> list[str]:
     url = f"{BASE_URL}/butecos/page/{page}/"
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=10, impersonate="chrome120")
-    except requests.RequestException as e:
+        response = page_obj.goto(url, timeout=30000, wait_until="domcontentloaded")
+        if not response or not response.ok:
+            print(f"  HTTP {response.status if response else '?'} para página {page}")
+            return []
+    except Exception as e:
         print(f"  erro ao buscar página {page}: {e}")
         return []
 
-    if not resp.ok:
-        print(f"  HTTP {resp.status_code} para página {page}")
-        return []
-
-    soup = BeautifulSoup(resp.text, "html.parser")
+    html = page_obj.content()
+    soup = BeautifulSoup(html, "html.parser")
     seen = set()
     slugs = []
     for a in soup.select("a[href*='/buteco/']"):
-        href = a["href"]
+        href = a.get("href", "")
         match = re.search(r"/buteco/([^/]+)/?$", href)
         if match:
             slug = match.group(1)
@@ -43,16 +39,19 @@ def get_slugs(page: int) -> list[str]:
     return slugs
 
 
-def scrape_buteco(slug: str) -> dict:
+def scrape_buteco(page_obj: Page, slug: str) -> dict:
     url = f"{BASE_URL}/buteco/{slug}/"
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=10, impersonate="chrome120")
-        resp.raise_for_status()
-    except requests.RequestException as e:
+        response = page_obj.goto(url, timeout=30000, wait_until="domcontentloaded")
+        if not response or not response.ok:
+            print(f"  HTTP {response.status if response else '?'} para {slug}")
+            return {}
+    except Exception as e:
         print(f"  erro ao buscar {slug}: {e}")
         return {}
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    html = page_obj.content()
+    soup = BeautifulSoup(html, "html.parser")
 
     nome_tag = soup.select_one("h1.section-title")
     nome = nome_tag.get_text(strip=True) if nome_tag else ""
@@ -76,7 +75,7 @@ def scrape_buteco(slug: str) -> dict:
             label = bold.get_text(strip=True).lower().rstrip(":")
             value = p.get_text(strip=True)[len(bold.get_text(strip=True)):].strip().lstrip(":").strip()
 
-            if label == "endereço" or label == "endereco":
+            if label in ("endereço", "endereco"):
                 endereco = value
             elif label == "telefone":
                 telefone = value
@@ -90,7 +89,6 @@ def scrape_buteco(slug: str) -> dict:
     bairro = None
     if endereco:
         parts = [p.strip() for p in endereco.split(",")]
-        # Remove estado (UF) se presente na última parte
         last = parts[-1].strip()
         if re.match(r"^[A-Z]{2}$", last):
             parts = parts[:-1]
@@ -147,40 +145,49 @@ def main() -> None:
     conn = psycopg2.connect(db_url)
     print("Conectado ao banco.")
 
-    page = 1
+    page_num = 1
     total = 0
     errors = 0
 
     try:
-        while True:
-            print(f"\n[página {page}] buscando slugs...")
-            slugs = get_slugs(page)
-            if not slugs:
-                print(f"  sem resultados — fim da paginação.")
-                break
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page_obj = browser.new_page()
 
-            for slug in slugs:
+            while True:
+                print(f"\n[página {page_num}] buscando slugs...")
+                slugs = get_slugs(page_obj, page_num)
+                if not slugs:
+                    print("  sem resultados — fim da paginação.")
+                    break
+
+                for slug in slugs:
+                    time.sleep(SLEEP)
+                    data = scrape_buteco(page_obj, slug)
+                    if not data:
+                        print(f"  {slug} → erro (sem dados)")
+                        errors += 1
+                        continue
+                    try:
+                        upsert_buteco(conn, data)
+                        print(f"  {slug} → ok")
+                        total += 1
+                    except Exception as e:
+                        print(f"  {slug} → erro no banco: {e}")
+                        conn.rollback()
+                        errors += 1
+
+                page_num += 1
                 time.sleep(SLEEP)
-                data = scrape_buteco(slug)
-                if not data:
-                    print(f"  {slug} → erro (sem dados)")
-                    errors += 1
-                    continue
-                try:
-                    upsert_buteco(conn, data)
-                    print(f"  {slug} → ok")
-                    total += 1
-                except Exception as e:
-                    print(f"  {slug} → erro no banco: {e}")
-                    conn.rollback()
-                    errors += 1
 
-            page += 1
-            time.sleep(SLEEP)
+            browser.close()
     finally:
         conn.close()
 
     print(f"\nConcluído: {total} butecos inseridos/atualizados, {errors} erros.")
+
+    if total == 0 and errors > 0:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
