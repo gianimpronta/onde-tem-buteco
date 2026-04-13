@@ -10,6 +10,8 @@ select = [
 
 exclude = ["test_bypass.py"]
 
+line-length = 100
+
 [format]
 quote-style = "double"
 indent-style = "space"
