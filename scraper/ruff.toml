@@ -1,3 +1,6 @@
+line-length = 100
+exclude = ["test_bypass.py"]
+
 [lint]
 select = [
   "E",   # pycodestyle errors
@@ -7,10 +10,6 @@ select = [
   "B",   # flake8-bugbear — bugs e design problems
   "UP",  # pyupgrade — modernização de sintaxe
 ]
-
-exclude = ["test_bypass.py"]
-
-line-length = 100
 
 [format]
 quote-style = "double"
