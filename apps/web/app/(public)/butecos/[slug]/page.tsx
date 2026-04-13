@@ -3,11 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
-export default async function ButecoPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function ButecoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
   const buteco = await prisma.buteco.findUnique({
@@ -38,9 +34,7 @@ export default async function ButecoPage({
       {buteco.petiscoNome && (
         <div className="mt-6">
           <h2 className="font-semibold text-amber-600">{buteco.petiscoNome}</h2>
-          {buteco.petiscoDesc && (
-            <p className="text-zinc-600 mt-1">{buteco.petiscoDesc}</p>
-          )}
+          {buteco.petiscoDesc && <p className="text-zinc-600 mt-1">{buteco.petiscoDesc}</p>}
         </div>
       )}
       <div className="mt-6 space-y-1 text-sm text-zinc-500">

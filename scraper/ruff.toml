@@ -1,0 +1,15 @@
+[lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "B",   # flake8-bugbear — bugs e design problems
+  "UP",  # pyupgrade — modernização de sintaxe
+]
+
+exclude = ["test_bypass.py"]
+
+[format]
+quote-style = "double"
+indent-style = "space"

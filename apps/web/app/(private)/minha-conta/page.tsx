@@ -28,10 +28,7 @@ export default async function MinhaContaPage() {
           <ul className="space-y-2">
             {user.favoritos.map(({ buteco }) => (
               <li key={buteco.slug}>
-                <a
-                  href={`/butecos/${buteco.slug}`}
-                  className="font-medium hover:underline"
-                >
+                <a href={`/butecos/${buteco.slug}`} className="font-medium hover:underline">
                   {buteco.nome}
                 </a>
                 <span className="text-zinc-500 text-sm ml-2">{buteco.cidade}</span>
@@ -49,10 +46,7 @@ export default async function MinhaContaPage() {
           <ul className="space-y-2">
             {user.visitas.map(({ buteco, visitadoEm }) => (
               <li key={buteco.slug}>
-                <a
-                  href={`/butecos/${buteco.slug}`}
-                  className="font-medium hover:underline"
-                >
+                <a href={`/butecos/${buteco.slug}`} className="font-medium hover:underline">
                   {buteco.nome}
                 </a>
                 <span className="text-zinc-500 text-sm ml-2">
