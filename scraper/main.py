@@ -106,7 +106,8 @@ def scrape_buteco(slug: str) -> dict:
             if not bold:
                 continue
             label = bold.get_text(strip=True).lower().rstrip(":")
-            value = p.get_text(strip=True)[len(bold.get_text(strip=True)):].strip().lstrip(":").strip()
+            bold_text = bold.get_text(strip=True)
+            value = p.get_text(strip=True)[len(bold_text):].strip().lstrip(":").strip()
 
             if label in ("endereço", "endereco"):
                 endereco = value
