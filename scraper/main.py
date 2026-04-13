@@ -90,7 +90,7 @@ def _parse_section_fields(section) -> dict:
             continue
         label = bold.get_text(strip=True).lower().rstrip(":")
         bold_text = bold.get_text(strip=True)
-        value = p.get_text(strip=True)[len(bold_text):].strip().lstrip(":").strip()
+        value = p.get_text(strip=True)[len(bold_text) :].strip().lstrip(":").strip()
 
         if label in ("endereço", "endereco"):
             result["endereco"] = value
@@ -133,10 +133,17 @@ def scrape_buteco(slug: str) -> dict:
     foto_url = (foto_tag.get("src") or foto_tag.get("data-src")) if foto_tag else None
 
     section = soup.select_one(".section-text")
-    fields = _parse_section_fields(section) if section else {
-        "endereco": None, "telefone": None, "horario": None,
-        "petisco_nome": None, "petisco_desc": None,
-    }
+    fields = (
+        _parse_section_fields(section)
+        if section
+        else {
+            "endereco": None,
+            "telefone": None,
+            "horario": None,
+            "petisco_nome": None,
+            "petisco_desc": None,
+        }
+    )
 
     endereco = fields["endereco"]
     cidade, bairro = _parse_location(endereco) if endereco else (None, None)
