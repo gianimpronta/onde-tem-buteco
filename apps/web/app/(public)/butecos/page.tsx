@@ -2,9 +2,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function ButecosPage({
   searchParams,
-}: {
-  searchParams: Promise<{ cidade?: string; bairro?: string; q?: string }>;
-}) {
+}: Readonly<{ searchParams: Promise<{ cidade?: string; bairro?: string; q?: string }> }>) {
   const { cidade, bairro, q } = await searchParams;
 
   const butecos = await prisma.buteco.findMany({
