@@ -75,6 +75,46 @@ def get_slugs(page: int) -> list[str]:
     return slugs
 
 
+def _parse_section_fields(section) -> dict:
+    """Extract endereco, telefone, horario and petisco from .section-text."""
+    result = {
+        "endereco": None,
+        "telefone": None,
+        "horario": None,
+        "petisco_nome": None,
+        "petisco_desc": None,
+    }
+    for i, p in enumerate(section.find_all("p")):
+        bold = p.find("b")
+        if not bold:
+            continue
+        label = bold.get_text(strip=True).lower().rstrip(":")
+        bold_text = bold.get_text(strip=True)
+        value = p.get_text(strip=True)[len(bold_text):].strip().lstrip(":").strip()
+
+        if label in ("endereço", "endereco"):
+            result["endereco"] = value
+        elif label == "telefone":
+            result["telefone"] = value
+        elif label in ("horario", "horário"):
+            result["horario"] = value
+        elif i == 0:
+            result["petisco_nome"] = bold_text
+            result["petisco_desc"] = value if value else None
+    return result
+
+
+def _parse_location(endereco: str) -> tuple[str | None, str | None]:
+    """Split endereco string into (cidade, bairro)."""
+    parts = [p.strip() for p in endereco.split(",")]
+    last = parts[-1].strip()
+    if re.match(r"^[A-Z]{2}$", last):
+        parts = parts[:-1]
+    cidade = parts[-1].strip() if parts else None
+    bairro = parts[-2].strip() if len(parts) >= 2 else None
+    return cidade, bairro
+
+
 def scrape_buteco(slug: str) -> dict:
     url = f"{BASE_URL}/buteco/{slug}/"
     html = fs_request(url)
@@ -93,41 +133,13 @@ def scrape_buteco(slug: str) -> dict:
     foto_url = (foto_tag.get("src") or foto_tag.get("data-src")) if foto_tag else None
 
     section = soup.select_one(".section-text")
-    petisco_nome = None
-    petisco_desc = None
-    endereco = None
-    telefone = None
-    horario = None
+    fields = _parse_section_fields(section) if section else {
+        "endereco": None, "telefone": None, "horario": None,
+        "petisco_nome": None, "petisco_desc": None,
+    }
 
-    if section:
-        paragraphs = section.find_all("p")
-        for i, p in enumerate(paragraphs):
-            bold = p.find("b")
-            if not bold:
-                continue
-            label = bold.get_text(strip=True).lower().rstrip(":")
-            bold_text = bold.get_text(strip=True)
-            value = p.get_text(strip=True)[len(bold_text):].strip().lstrip(":").strip()
-
-            if label in ("endereço", "endereco"):
-                endereco = value
-            elif label == "telefone":
-                telefone = value
-            elif label in ("horario", "horário"):
-                horario = value
-            elif i == 0:
-                petisco_nome = bold.get_text(strip=True)
-                petisco_desc = value if value else None
-
-    cidade = None
-    bairro = None
-    if endereco:
-        parts = [p.strip() for p in endereco.split(",")]
-        last = parts[-1].strip()
-        if re.match(r"^[A-Z]{2}$", last):
-            parts = parts[:-1]
-        cidade = parts[-1].strip() if parts else None
-        bairro = parts[-2].strip() if len(parts) >= 2 else None
+    endereco = fields["endereco"]
+    cidade, bairro = _parse_location(endereco) if endereco else (None, None)
 
     return {
         "slug": slug,
@@ -135,10 +147,10 @@ def scrape_buteco(slug: str) -> dict:
         "cidade": cidade or "",
         "bairro": bairro,
         "endereco": endereco or "",
-        "telefone": telefone,
-        "horario": horario,
-        "petisco_nome": petisco_nome,
-        "petisco_desc": petisco_desc,
+        "telefone": fields["telefone"],
+        "horario": fields["horario"],
+        "petisco_nome": fields["petisco_nome"],
+        "petisco_desc": fields["petisco_desc"],
         "foto_url": foto_url,
     }
 
