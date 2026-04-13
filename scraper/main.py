@@ -1,9 +1,10 @@
 import os
+import re
 import sys
 import time
-import re
-import requests
+
 import psycopg2
+import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
