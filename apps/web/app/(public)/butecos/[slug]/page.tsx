@@ -1,3 +1,5 @@
+import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
@@ -16,13 +18,15 @@ export default async function ButecoPage({
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
-      <a href="/butecos" className="text-sm text-zinc-500 hover:underline mb-4 block">
+      <Link href="/butecos" className="text-sm text-zinc-500 hover:underline mb-4 block">
         ← Voltar
-      </a>
+      </Link>
       {buteco.fotoUrl && (
-        <img
+        <Image
           src={buteco.fotoUrl}
           alt={buteco.nome}
+          width={800}
+          height={224}
           className="w-full h-56 object-cover rounded-xl mb-6"
         />
       )}
