@@ -13,7 +13,7 @@ permissions:
   security-events: write
 
 jobs:
-  # ── Secrets: detecta credenciais vazadas no histórico git ──────────────────
+  # ── Secrets: credenciais vazadas no histórico git ─────────────────────────
   gitleaks:
     name: Secret scanning (gitleaks)
     runs-on: ubuntu-latest
@@ -21,11 +21,61 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          fetch-depth: 0 # histórico completo para varrer todos os commits
+          fetch-depth: 0
 
       - uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc # v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Python SAST: vulnerabilidades comuns no código do scraper ─────────────
+  bandit:
+    name: SAST Python (bandit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Run bandit
+        run: |
+          pip install bandit[toml] --quiet
+          bandit -r scraper/ \
+            --format sarif \
+            --output bandit-results.sarif \
+            --severity-level medium \
+            || true
+
+      - uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c # v3
+        with:
+          sarif_file: bandit-results.sarif
+          category: bandit
+
+  # ── TypeScript SAST: padrões inseguros no app Next.js ────────────────────
+  eslint-security:
+    name: SAST TypeScript (eslint-plugin-security)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts
+
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci --ignore-scripts
+
+      - name: Run ESLint security scan
+        working-directory: apps/web
+        run: npm run lint
 
   # ── Python: vulnerabilidades em dependências do scraper ───────────────────
   pip-audit:
@@ -63,22 +113,20 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - name: Scan FlareSolverr image
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           image-ref: ghcr.io/flaresolverr/flaresolverr:latest
           format: sarif
           output: trivy-results.sarif
           severity: CRITICAL,HIGH
-          exit-code: "0" # não falha o build, apenas reporta
+          exit-code: "0"
 
-      - name: Upload Trivy results to Security tab
-        uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c # v3
+      - uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c # v3
         with:
           sarif_file: trivy-results.sarif
           category: trivy-flaresolverr
 
-  # ── Workflows: lint dos arquivos de CI ────────────────────────────────────
+  # ── Workflows: lint e segurança dos arquivos de CI ────────────────────────
   actionlint:
     name: Workflow lint (actionlint)
     runs-on: ubuntu-latest

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 export default async function Home() {
@@ -11,12 +12,12 @@ export default async function Home() {
           ? `${total} botecos participando`
           : "Em breve: todos os botecos do Comida di Buteco no mapa"}
       </p>
-      <a
+      <Link
         href="/butecos"
         className="px-6 py-3 rounded-full bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-colors"
       >
         Ver botecos
-      </a>
+      </Link>
     </main>
   );
 }
