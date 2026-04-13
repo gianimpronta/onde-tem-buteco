@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
-  const { butecoId, action } = await request.json() as {
+  const { butecoId, action } = (await request.json()) as {
     butecoId: string;
     action: "favoritar" | "desfavoritar" | "visitar";
   };

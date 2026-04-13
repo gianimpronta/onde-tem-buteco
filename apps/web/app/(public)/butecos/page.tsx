@@ -42,9 +42,7 @@ export default async function ButecosPage({
                   {b.bairro ? `${b.bairro}, ` : ""}
                   {b.cidade}
                 </p>
-                {b.petiscoNome && (
-                  <p className="text-sm text-amber-600 mt-1">{b.petiscoNome}</p>
-                )}
+                {b.petiscoNome && <p className="text-sm text-amber-600 mt-1">{b.petiscoNome}</p>}
               </a>
             </li>
           ))}
