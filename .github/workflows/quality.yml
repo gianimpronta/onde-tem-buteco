@@ -24,7 +24,7 @@ jobs:
 
       - name: Run ruff check
         run: |
-          pip install ruff --quiet
+          pip install "ruff==0.11.6" --quiet
           ruff check scraper/
           ruff format --check scraper/
 
