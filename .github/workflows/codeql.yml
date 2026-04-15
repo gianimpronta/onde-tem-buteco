@@ -8,34 +8,38 @@ on:
   schedule:
     - cron: "0 7 * * 1" # segunda-feira 07h UTC
 
-permissions:
-  contents: read
-  security-events: write # necessário para publicar resultados SARIF
+
 
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
+    permissions:
+      contents: read
+      security-events: write # necessário para publicar resultados SARIF
+      packages: read
     strategy:
       fail-fast: false
       matrix:
-        language: [python, javascript-typescript]
+        include:
+        - language: javascript-typescript
+          build-mode: none
+        - language: python
+          build-mode: none
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # actions/checkout v6.0.2
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c # v3
+        uses: github/codeql-action/init@v4 # v4
         with:
           languages: ${{ matrix.language }}
           queries: security-and-quality
+          build-mode: ${{ matrix.build-mode }}
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c # v3
-
+     
       - name: Analyze
-        uses: github/codeql-action/analyze@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c # v3
+        uses: github/codeql-action/analyze@v4 # v4
         with:
           category: "/language:${{ matrix.language }}"
