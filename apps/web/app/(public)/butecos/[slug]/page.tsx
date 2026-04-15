@@ -3,7 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
-export default async function ButecoPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ButecoPage({
+  params,
+}: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
 
   const buteco = await prisma.buteco.findUnique({
