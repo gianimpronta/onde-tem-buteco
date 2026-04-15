@@ -45,7 +45,7 @@
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/gianimprotta/onde-tem-buteco.git
+git clone https://github.com/gianimpronta/onde-tem-buteco.git
 cd onde-tem-buteco
 ```
 
