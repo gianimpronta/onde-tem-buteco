@@ -1,0 +1,44 @@
+name: OSSF Scorecard
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 7 * * 1" # segunda-feira 07h UTC
+  # Necessário para publicar resultados na aba Security do GitHub
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  scorecard:
+    name: OSSF Scorecard
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      security-events: write   # publicar resultados SARIF
+      id-token: write          # autenticação sem token armazenado
+      contents: read
+      actions: read
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: ossf/scorecard-action@99c09fe975337306107572b4fdf4db224cf8e2f2 # v2.4.3
+        with:
+          results_file: scorecard-results.sarif
+          results_format: sarif
+          publish_results: true
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: scorecard-results
+          path: scorecard-results.sarif
+          retention-days: 5
+
+      - uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c # v3
+        with:
+          sarif_file: scorecard-results.sarif
+          category: ossf-scorecard

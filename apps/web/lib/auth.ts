@@ -26,7 +26,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           select: { id: true },
         });
         if (dbUser) {
-          (session.user as typeof session.user & { id: string }).id = dbUser.id;
+          session.user.id = dbUser.id;
         }
       }
       return session;
