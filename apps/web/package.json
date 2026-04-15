@@ -34,5 +34,10 @@
     "prettier": "^3.8.2",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "overrides": {
+      "@hono/node-server": ">=1.19.13"
+    }
   }
 }

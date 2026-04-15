@@ -11,12 +11,27 @@ __pycache__/
 .Python
 scraper/.env
 
+# Python coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
 # Node
 node_modules/
 .next/
 
+# TypeScript
+*.tsbuildinfo
+
+# Coverage reports
+coverage/
+
 # Vercel
 .vercel
+
+# Claude Code — user-specific overrides and ephemeral worktrees
+.claude/settings.local.json
+.claude/worktrees/
 
 # OS
 .DS_Store
