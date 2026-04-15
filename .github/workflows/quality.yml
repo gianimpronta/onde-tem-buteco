@@ -67,7 +67,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install -r scraper/requirements.txt pytest pytest-cov --quiet
+        run: pip install -r scraper/requirements.txt "pytest==8.3.5" "pytest-cov==6.1.0" --quiet
 
       - name: Run tests with coverage
         run: |
@@ -77,7 +77,7 @@ jobs:
             --cov-config=scraper/.coveragerc \
             -v
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: coverage-python
           path: scraper/coverage.xml
@@ -108,7 +108,7 @@ jobs:
         working-directory: apps/web
         run: pnpm test --coverage
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: coverage-typescript
           path: apps/web/coverage/lcov.info
@@ -124,12 +124,12 @@ jobs:
         with:
           fetch-depth: 0 # histórico completo para blame e new-code detection
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: coverage-python
           path: scraper/
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: coverage-typescript
           path: apps/web/coverage/
