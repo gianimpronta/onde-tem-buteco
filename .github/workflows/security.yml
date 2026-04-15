@@ -92,6 +92,8 @@ jobs:
           inputs: scraper/requirements.txt
 
   # ── Node.js: vulnerabilidades em dependências do app web ──────────────────
+  # pnpm audit usa endpoints do npm que foram aposentados (410 Gone).
+  # Substituído por osv-scanner que consulta o banco OSV do Google diretamente.
   npm-audit:
     name: Dependency audit (npm)
     runs-on: ubuntu-latest
@@ -99,17 +101,12 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - name: Run osv-scanner
+        uses: google/osv-scanner-action/osv-scanner-action@c51854704019a247608d928f370c98740469d4b5 # v2.3.5
         with:
-          node-version: "22"
-
-      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
-        with:
-          version: 10.33.0
-
-      - name: pnpm audit
-        working-directory: apps/web
-        run: pnpm audit --audit-level=high
+          scan-args: |-
+            --lockfile=apps/web/pnpm-lock.yaml
+            --verbosity=error
 
   # ── Docker: vulnerabilidades na imagem do FlareSolverr ────────────────────
   trivy:
