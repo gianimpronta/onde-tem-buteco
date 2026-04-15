@@ -1,5 +1,12 @@
 # 🍺 Onde Tem Buteco
 
+[![Code quality](https://github.com/gianimpronta/onde-tem-buteco/actions/workflows/quality.yml/badge.svg)](https://github.com/gianimpronta/onde-tem-buteco/actions/workflows/quality.yml)
+[![CodeQL SAST](https://github.com/gianimpronta/onde-tem-buteco/actions/workflows/codeql.yml/badge.svg)](https://github.com/gianimpronta/onde-tem-buteco/actions/workflows/codeql.yml)
+[![Security scanning](https://github.com/gianimpronta/onde-tem-buteco/actions/workflows/security.yml/badge.svg)](https://github.com/gianimpronta/onde-tem-buteco/actions/workflows/security.yml)
+[![Scraper semanal](https://github.com/gianimpronta/onde-tem-buteco/actions/workflows/scraper.yml/badge.svg)](https://github.com/gianimpronta/onde-tem-buteco/actions/workflows/scraper.yml)
+[![OpenSSF Scorecard](https://github.com/gianimpronta/onde-tem-buteco/actions/workflows/scorecard.yml/badge.svg)](https://github.com/gianimpronta/onde-tem-buteco/actions/workflows/scorecard.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 > Encontre botecos do Comida di Buteco perto de você, monte seu roteiro e registre os que já visitou.
 
 ---
