@@ -20,8 +20,8 @@ devem ser alterados manualmente no banco.
 ## Repositório
 
 - **Nome:** `onde-tem-buteco`
-- **Organização:** `gianimprotta`
-- **URL:** `https://github.com/gianimprotta/onde-tem-buteco`
+- **Organização:** `gianimpronta`
+- **URL:** `https://github.com/gianimpronta/onde-tem-buteco`
 
 ---
 
