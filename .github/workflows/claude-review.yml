@@ -1,0 +1,52 @@
+name: Claude code review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  pull_request_review_comment:
+    types: [created]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    name: Claude review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: >
+      (github.event_name == 'pull_request') ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request != null && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@06e80808089d6f52f03cf401bc7ac4f03528b3c5 # v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          direct_prompt: |
+            Você é um revisor de código para o projeto Onde Tem Buteco.
+            Revise este PR com atenção às seguintes diretrizes do projeto:
+
+            - TypeScript strict mode — sem `any`
+            - Server Components por padrão; `"use client"` só quando necessário
+            - Nunca usar `prisma.$queryRaw` — usar apenas a API do Prisma
+            - Sem CSS customizado fora do Tailwind
+            - Sem commitar secrets ou credenciais
+            - Nunca expor o Prisma client no browser
+            - Python: respeitar rate limit com `time.sleep`, sem scraping agressivo
+
+            Verifique também:
+            - Segurança: injection, XSS, dados sensíveis expostos
+            - Lógica: bugs óbvios, edge cases não tratados
+            - Consistência com o código existente
+
+            Se o PR estiver correto e seguro, aprove-o explicitamente.
+            Se houver problemas críticos, solicite mudanças.
+            Seja objetivo e direto — sem elogios desnecessários.
