@@ -41,7 +41,7 @@ jobs:
 
       - name: Run bandit
         run: |
-          pip install bandit[toml] bandit-sarif-formatter --quiet
+          pip install "bandit[toml]==1.8.3" "bandit-sarif-formatter==1.1.1" --quiet
           bandit -r scraper/ \
             --format sarif \
             --output bandit-results.sarif \
