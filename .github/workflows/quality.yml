@@ -22,11 +22,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run ruff check
+      - name: Run ruff fix
         run: |
           pip install "ruff==0.11.6" --quiet
-          ruff check scraper/
-          ruff format --check scraper/
+          ruff check --fix scraper/
+          ruff format scraper/
+          git diff --exit-code
 
   # ── TypeScript: formatação via Prettier ───────────────────────────────────
   prettier:
@@ -50,9 +51,11 @@ jobs:
         working-directory: apps/web
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Run prettier check
+      - name: Run prettier fix
         working-directory: apps/web
-        run: npx prettier --check "app/**/*.{ts,tsx}" "lib/**/*.{ts,tsx}"
+        run: |
+          npx prettier --write "app/**/*.{ts,tsx}" "lib/**/*.{ts,tsx}"
+          git diff --exit-code
 
   # ── Python: cobertura de testes ───────────────────────────────────────────
   coverage-python:
