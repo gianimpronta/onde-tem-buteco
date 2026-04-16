@@ -8,6 +8,7 @@ from main import (
     _parse_location,
     _parse_section_fields,
     _slugify,
+    fs_create_session,
     fs_request,
     geocode_address,
     get_slugs,
@@ -168,6 +169,20 @@ class TestGeocodeAddress:
         assert lat is None
         assert lng is None
 
+    def test_returns_none_tuple_when_api_returns_empty_payload(self):
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = []
+        with patch("main.requests.get", return_value=mock_resp):
+            lat, lng = geocode_address("Rua sem resultado")
+        assert lat is None
+        assert lng is None
+
+
+class TestFsCreateSession:
+    def test_ignores_flaresolverr_exception(self):
+        with patch("main.requests.post", side_effect=RuntimeError("offline")):
+            fs_create_session()
+
 
 # ── get_slugs ────────────────────────────────────────────────────────────────
 
@@ -321,6 +336,14 @@ class TestUpsertButeco:
 
 
 class TestMainLoop:
+    @patch.dict("main.os.environ", {}, clear=True)
+    def test_raises_when_database_url_is_missing(self):
+        try:
+            main()
+            raise AssertionError("main() deveria falhar sem POSTGRES_URL_NON_POOLING")
+        except RuntimeError as err:
+            assert "POSTGRES_URL_NON_POOLING não definida" in str(err)
+
     @patch.dict("main.os.environ", {"POSTGRES_URL_NON_POOLING": "postgres://example"}, clear=True)
     @patch("main.time.sleep")
     @patch("main.psycopg2.connect")
@@ -351,3 +374,57 @@ class TestMainLoop:
         mock_sleep.assert_any_call(0.5)
         assert mock_upsert_buteco.call_count == 2
         conn.close.assert_called_once()
+
+    @patch.dict("main.os.environ", {"POSTGRES_URL_NON_POOLING": "postgres://example"}, clear=True)
+    @patch("main.time.sleep")
+    @patch("main.psycopg2.connect")
+    @patch("main.fs_create_session")
+    @patch("main.upsert_buteco")
+    @patch("main.scrape_buteco")
+    @patch("main.get_slugs")
+    @patch("main.sys.exit")
+    def test_exits_with_code_one_when_only_errors_happen(
+        self,
+        mock_exit,
+        mock_get_slugs,
+        mock_scrape_buteco,
+        _mock_upsert_buteco,
+        _mock_fs_create_session,
+        mock_connect,
+        _mock_sleep,
+    ):
+        mock_get_slugs.side_effect = [["bar-1"], []]
+        mock_scrape_buteco.return_value = {}
+        mock_connect.return_value = MagicMock()
+
+        main()
+
+        mock_exit.assert_called_once_with(1)
+
+    @patch.dict("main.os.environ", {"POSTGRES_URL_NON_POOLING": "postgres://example"}, clear=True)
+    @patch("main.time.sleep")
+    @patch("main.psycopg2.connect")
+    @patch("main.fs_create_session")
+    @patch("main.upsert_buteco", side_effect=RuntimeError("db down"))
+    @patch("main.scrape_buteco")
+    @patch("main.get_slugs")
+    @patch("main.sys.exit")
+    def test_rolls_back_when_upsert_raises(
+        self,
+        mock_exit,
+        mock_get_slugs,
+        mock_scrape_buteco,
+        _mock_upsert_buteco,
+        _mock_fs_create_session,
+        mock_connect,
+        _mock_sleep,
+    ):
+        mock_get_slugs.side_effect = [["bar-1"], []]
+        mock_scrape_buteco.return_value = {"slug": "bar-1", "nome": "Bar 1", "cidade": "", "endereco": ""}
+        conn = MagicMock()
+        mock_connect.return_value = conn
+
+        main()
+
+        conn.rollback.assert_called_once()
+        mock_exit.assert_called_once_with(1)
