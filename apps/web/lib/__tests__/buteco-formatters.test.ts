@@ -7,7 +7,7 @@ describe("buteco-formatters", () => {
 
   it("formats address from optional parts", () => {
     expect(formatAddress(["Rua A, 10", undefined, "Centro", "Belo Horizonte"])).toBe(
-      "Rua A, 10, Centro, Belo Horizonte",
+      "Rua A, 10, Centro, Belo Horizonte"
     );
   });
 
