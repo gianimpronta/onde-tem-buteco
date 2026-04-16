@@ -1,5 +1,4 @@
-import { describe, expect, it } from "vitest";
-import { isValidAction } from "../buteco-actions";
+import { isValidAction } from "@/lib/buteco-actions";
 
 describe("isValidAction", () => {
   it("accepts valid actions", () => {
