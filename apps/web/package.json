@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
     "format:check": "prettier --check \"app/**/*.{ts,tsx}\" \"lib/**/*.{ts,tsx}\""
   },
   "dependencies": {
@@ -31,13 +32,16 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "eslint-plugin-security": "^4.0.0",
+    "@vitest/coverage-v8": "^4",
     "prettier": "^3.8.2",
     "tailwindcss": "^4",
-    "typescript": "^6"
+    "typescript": "^6",
+    "vitest": "^4"
   },
   "pnpm": {
     "overrides": {
-      "@hono/node-server": ">=1.19.13"
+      "@hono/node-server": ">=1.19.13",
+      "hono": ">=4.12.14"
     }
   }
 }
