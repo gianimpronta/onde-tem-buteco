@@ -1,10 +1,21 @@
 export function generateSlug(nome: string): string {
-  return nome
+  const slug = nome
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replaceAll(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replaceAll(/[^a-z0-9]+/g, "-");
+
+  let trimmedSlug = slug;
+
+  while (trimmedSlug.startsWith("-")) {
+    trimmedSlug = trimmedSlug.slice(1);
+  }
+
+  while (trimmedSlug.endsWith("-")) {
+    trimmedSlug = trimmedSlug.slice(0, -1);
+  }
+
+  return trimmedSlug;
 }
 
 export function formatAddress(parts: Array<string | null | undefined>): string {
@@ -17,7 +28,7 @@ export function formatAddress(parts: Array<string | null | undefined>): string {
 export function formatPhone(phone?: string | null): string | null {
   if (!phone) return null;
 
-  const digits = phone.replace(/\D/g, "");
+  const digits = phone.replaceAll(/\D/g, "");
 
   if (digits.length === 11) {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
