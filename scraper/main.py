@@ -12,7 +12,7 @@ load_dotenv()
 
 BASE_URL = "https://comidadibuteco.com.br"
 FLARESOLVERR = "http://localhost:8191/v1"
-SLEEP = 1.0
+SLEEP = 0.5
 SESSION_ID = "scraper-session"
 
 

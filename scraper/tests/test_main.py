@@ -9,7 +9,9 @@ from main import (
     _parse_section_fields,
     fs_request,
     get_slugs,
+    main,
     scrape_buteco,
+    upsert_buteco,
 )
 
 # ── _parse_location ──────────────────────────────────────────────────────────
@@ -229,3 +231,70 @@ class TestScrapeButeco:
         assert data["endereco"] == ""
         assert data["cidade"] == ""
         assert data["foto_url"] is None
+
+
+# ── upsert_buteco ────────────────────────────────────────────────────────────
+
+
+class TestUpsertButeco:
+    def test_executes_upsert_and_commits(self):
+        conn = MagicMock()
+        cur_ctx = MagicMock()
+        conn.cursor.return_value.__enter__.return_value = cur_ctx
+        data = {
+            "slug": "bar-do-ze",
+            "nome": "Bar do Zé",
+            "cidade": "Belo Horizonte",
+            "bairro": "Floresta",
+            "endereco": "Rua A, 1",
+            "telefone": "(31) 3333-0000",
+            "horario": "18h-23h",
+            "petisco_nome": "Torresmo",
+            "petisco_desc": "Crocante",
+            "foto_url": "https://example.com/foto.jpg",
+        }
+
+        upsert_buteco(conn, data)
+
+        cur_ctx.execute.assert_called_once()
+        sql, params = cur_ctx.execute.call_args[0]
+        assert 'INSERT INTO "Buteco"' in sql
+        assert "ON CONFLICT (slug) DO UPDATE SET" in sql
+        assert params == data
+        conn.commit.assert_called_once()
+
+
+# ── main ─────────────────────────────────────────────────────────────────────
+
+
+class TestMainLoop:
+    @patch.dict("main.os.environ", {"POSTGRES_URL_NON_POOLING": "postgres://example"}, clear=True)
+    @patch("main.time.sleep")
+    @patch("main.psycopg2.connect")
+    @patch("main.fs_create_session")
+    @patch("main.upsert_buteco")
+    @patch("main.scrape_buteco")
+    @patch("main.get_slugs")
+    def test_calls_sleep_between_requests_and_pages(
+        self,
+        mock_get_slugs,
+        mock_scrape_buteco,
+        mock_upsert_buteco,
+        _mock_fs_create_session,
+        mock_connect,
+        mock_sleep,
+    ):
+        mock_get_slugs.side_effect = [["bar-1", "bar-2"], []]
+        mock_scrape_buteco.side_effect = [
+            {"slug": "bar-1", "nome": "Bar 1", "cidade": "", "endereco": ""},
+            {"slug": "bar-2", "nome": "Bar 2", "cidade": "", "endereco": ""},
+        ]
+        conn = MagicMock()
+        mock_connect.return_value = conn
+
+        main()
+
+        assert mock_sleep.call_count == 3
+        mock_sleep.assert_any_call(0.5)
+        assert mock_upsert_buteco.call_count == 2
+        conn.close.assert_called_once()
