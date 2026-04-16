@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isValidAction } from "@/lib/buteco-actions";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -10,8 +11,12 @@ export async function POST(request: Request) {
 
   const { butecoId, action } = (await request.json()) as {
     butecoId: string;
-    action: "favoritar" | "desfavoritar" | "visitar";
+    action: string;
   };
+
+  if (!isValidAction(action)) {
+    return NextResponse.json({ error: "Ação inválida" }, { status: 400 });
+  }
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
