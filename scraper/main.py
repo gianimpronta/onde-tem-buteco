@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import time
+import unicodedata
 
 import psycopg2
 import requests
@@ -12,8 +13,10 @@ load_dotenv()
 
 BASE_URL = "https://comidadibuteco.com.br"
 FLARESOLVERR = "http://localhost:8191/v1"
-SLEEP = 1.0
+SLEEP = 0.5
 SESSION_ID = "scraper-session"
+NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
+USER_AGENT = "onde-tem-buteco-scraper/1.0"
 
 
 def fs_request(url: str) -> str:
@@ -115,6 +118,30 @@ def _parse_location(endereco: str) -> tuple[str | None, str | None]:
     return cidade, bairro
 
 
+def _slugify(name: str) -> str:
+    normalized = unicodedata.normalize("NFKD", name)
+    ascii_name = normalized.encode("ascii", "ignore").decode("ascii")
+    slug = re.sub(r"[^a-z0-9]+", "-", ascii_name.lower()).strip("-")
+    return slug
+
+
+def geocode_address(endereco: str) -> tuple[float | None, float | None]:
+    try:
+        resp = requests.get(
+            NOMINATIM_URL,
+            params={"q": endereco, "format": "json", "limit": 1},
+            headers={"User-Agent": USER_AGENT},
+            timeout=20,
+        )
+        data = resp.json()
+        if not data:
+            return None, None
+        first = data[0]
+        return float(first["lat"]), float(first["lon"])
+    except Exception:
+        return None, None
+
+
 def scrape_buteco(slug: str) -> dict:
     url = f"{BASE_URL}/buteco/{slug}/"
     html = fs_request(url)
@@ -148,8 +175,11 @@ def scrape_buteco(slug: str) -> dict:
     endereco = fields["endereco"]
     cidade, bairro = _parse_location(endereco) if endereco else (None, None)
 
+    lat, lng = geocode_address(endereco) if endereco else (None, None)
+    final_slug = slug or _slugify(nome)
+
     return {
-        "slug": slug,
+        "slug": final_slug,
         "nome": nome,
         "cidade": cidade or "",
         "bairro": bairro,
@@ -159,6 +189,8 @@ def scrape_buteco(slug: str) -> dict:
         "petisco_nome": fields["petisco_nome"],
         "petisco_desc": fields["petisco_desc"],
         "foto_url": foto_url,
+        "lat": lat,
+        "lng": lng,
     }
 
 
@@ -170,8 +202,8 @@ def upsert_buteco(conn, data: dict) -> None:
             "fotoUrl", lat, lng, "createdAt", "updatedAt"
         ) VALUES (
             gen_random_uuid()::text, %(slug)s, %(nome)s, %(cidade)s, %(bairro)s, %(endereco)s,
-            %(telefone)s, %(horario)s, %(petisco_nome)s, %(petisco_desc)s,
-            %(foto_url)s, NULL, NULL, NOW(), NOW()
+            %(telefone)s, %(horario)s, %(petisco_nome)s, %(petisco_desc)s, %(foto_url)s,
+            %(lat)s, %(lng)s, NOW(), NOW()
         )
         ON CONFLICT (slug) DO UPDATE SET
             nome          = EXCLUDED.nome,
@@ -183,6 +215,8 @@ def upsert_buteco(conn, data: dict) -> None:
             "petiscoNome" = EXCLUDED."petiscoNome",
             "petiscoDesc" = EXCLUDED."petiscoDesc",
             "fotoUrl"     = EXCLUDED."fotoUrl",
+            lat           = EXCLUDED.lat,
+            lng           = EXCLUDED.lng,
             "updatedAt"   = NOW()
     """
     with conn.cursor() as cur:

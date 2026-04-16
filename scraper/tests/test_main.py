@@ -7,9 +7,13 @@ from bs4 import BeautifulSoup
 from main import (
     _parse_location,
     _parse_section_fields,
+    _slugify,
     fs_request,
+    geocode_address,
     get_slugs,
+    main,
     scrape_buteco,
+    upsert_buteco,
 )
 
 # ── _parse_location ──────────────────────────────────────────────────────────
@@ -40,6 +44,11 @@ class TestParseLocation:
         cidade, bairro = _parse_location("  Savassi ,  Belo Horizonte , MG ")
         assert cidade == "Belo Horizonte"
         assert bairro == "Savassi"
+
+
+class TestSlugify:
+    def test_generates_slug_from_name(self):
+        assert _slugify("Bar do Zé & Filhos!") == "bar-do-ze-filhos"
 
 
 # ── _parse_section_fields ────────────────────────────────────────────────────
@@ -138,6 +147,28 @@ class TestFsRequest:
         assert result == ""
 
 
+class TestGeocodeAddress:
+    def test_calls_nominatim_and_returns_coordinates(self):
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = [{"lat": "-19.9167", "lon": "-43.9345"}]
+        with patch("main.requests.get", return_value=mock_resp) as mock_get:
+            lat, lng = geocode_address("Rua A, Centro, Belo Horizonte")
+
+        assert lat == -19.9167
+        assert lng == -43.9345
+        mock_get.assert_called_once()
+        _, kwargs = mock_get.call_args
+        assert kwargs["params"]["q"] == "Rua A, Centro, Belo Horizonte"
+        assert kwargs["params"]["format"] == "json"
+        assert kwargs["params"]["limit"] == 1
+
+    def test_returns_none_tuple_when_api_fails(self):
+        with patch("main.requests.get", side_effect=RuntimeError("network down")):
+            lat, lng = geocode_address("Rua B, 10")
+        assert lat is None
+        assert lng is None
+
+
 # ── get_slugs ────────────────────────────────────────────────────────────────
 
 _SLUG_PAGE_HTML = """
@@ -185,7 +216,9 @@ _BUTECO_HTML = """
 
 class TestScrapeButeco:
     def test_parses_full_page(self):
-        with patch("main.fs_request", return_value=_BUTECO_HTML):
+        with patch("main.fs_request", return_value=_BUTECO_HTML), patch(
+            "main.geocode_address", return_value=(-19.9, -43.9)
+        ):
             data = scrape_buteco("bar-do-ze")
         assert data["slug"] == "bar-do-ze"
         assert data["nome"] == "Bar do Zé"
@@ -197,6 +230,8 @@ class TestScrapeButeco:
         assert data["petisco_nome"] == "Torresmo Artesanal"
         assert data["petisco_desc"] == "Crocante e temperado"
         assert data["foto_url"] == "https://example.com/foto.jpg"
+        assert data["lat"] == -19.9
+        assert data["lng"] == -43.9
 
     def test_returns_empty_dict_when_no_html(self):
         with patch("main.fs_request", return_value=""):
@@ -217,7 +252,9 @@ class TestScrapeButeco:
             "<p><b>Endereço:</b> Rua B, Centro, Rio de Janeiro</p>"
             "</div></body></html>"
         )
-        with patch("main.fs_request", return_value=html):
+        with patch("main.fs_request", return_value=html), patch(
+            "main.geocode_address", return_value=(None, None)
+        ):
             data = scrape_buteco("buteco-x")
         assert data["foto_url"] == "https://cdn.example.com/lazy.jpg"
 
@@ -229,3 +266,85 @@ class TestScrapeButeco:
         assert data["endereco"] == ""
         assert data["cidade"] == ""
         assert data["foto_url"] is None
+
+    def test_generates_slug_from_name_when_input_slug_is_empty(self):
+        html = (
+            "<html><body>"
+            "<h1 class='section-title'>Cantina do João</h1>"
+            "<div class='section-text'><p><b>Endereço:</b> Rua C, Centro, Curitiba</p></div>"
+            "</body></html>"
+        )
+        with patch("main.fs_request", return_value=html), patch(
+            "main.geocode_address", return_value=(None, None)
+        ):
+            data = scrape_buteco("")
+        assert data["slug"] == "cantina-do-joao"
+
+
+# ── upsert_buteco ────────────────────────────────────────────────────────────
+
+
+class TestUpsertButeco:
+    def test_executes_upsert_and_commits(self):
+        conn = MagicMock()
+        cur_ctx = MagicMock()
+        conn.cursor.return_value.__enter__.return_value = cur_ctx
+        data = {
+            "slug": "bar-do-ze",
+            "nome": "Bar do Zé",
+            "cidade": "Belo Horizonte",
+            "bairro": "Floresta",
+            "endereco": "Rua A, 1",
+            "telefone": "(31) 3333-0000",
+            "horario": "18h-23h",
+            "petisco_nome": "Torresmo",
+            "petisco_desc": "Crocante",
+            "foto_url": "https://example.com/foto.jpg",
+            "lat": -19.9,
+            "lng": -43.9,
+        }
+
+        upsert_buteco(conn, data)
+
+        cur_ctx.execute.assert_called_once()
+        sql, params = cur_ctx.execute.call_args[0]
+        assert 'INSERT INTO "Buteco"' in sql
+        assert "ON CONFLICT (slug) DO UPDATE SET" in sql
+        assert params == data
+        conn.commit.assert_called_once()
+
+
+# ── main ─────────────────────────────────────────────────────────────────────
+
+
+class TestMainLoop:
+    @patch.dict("main.os.environ", {"POSTGRES_URL_NON_POOLING": "postgres://example"}, clear=True)
+    @patch("main.time.sleep")
+    @patch("main.psycopg2.connect")
+    @patch("main.fs_create_session")
+    @patch("main.upsert_buteco")
+    @patch("main.scrape_buteco")
+    @patch("main.get_slugs")
+    def test_calls_sleep_between_requests_and_pages(
+        self,
+        mock_get_slugs,
+        mock_scrape_buteco,
+        mock_upsert_buteco,
+        _mock_fs_create_session,
+        mock_connect,
+        mock_sleep,
+    ):
+        mock_get_slugs.side_effect = [["bar-1", "bar-2"], []]
+        mock_scrape_buteco.side_effect = [
+            {"slug": "bar-1", "nome": "Bar 1", "cidade": "", "endereco": ""},
+            {"slug": "bar-2", "nome": "Bar 2", "cidade": "", "endereco": ""},
+        ]
+        conn = MagicMock()
+        mock_connect.return_value = conn
+
+        main()
+
+        assert mock_sleep.call_count == 3
+        mock_sleep.assert_any_call(0.5)
+        assert mock_upsert_buteco.call_count == 2
+        conn.close.assert_called_once()
