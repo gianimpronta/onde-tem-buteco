@@ -1,7 +1,7 @@
 """Unit tests for scraper/main.py"""
+
 from unittest.mock import MagicMock, patch
 
-import pytest
 from bs4 import BeautifulSoup
 
 from main import (
@@ -11,7 +11,6 @@ from main import (
     get_slugs,
     scrape_buteco,
 )
-
 
 # ── _parse_location ──────────────────────────────────────────────────────────
 
@@ -223,11 +222,7 @@ class TestScrapeButeco:
         assert data["foto_url"] == "https://cdn.example.com/lazy.jpg"
 
     def test_no_section_text_still_returns_data(self):
-        html = (
-            "<html><body>"
-            "<h1 class='section-title'>Buteco Minimal</h1>"
-            "</body></html>"
-        )
+        html = "<html><body><h1 class='section-title'>Buteco Minimal</h1></body></html>"
         with patch("main.fs_request", return_value=html):
             data = scrape_buteco("buteco-minimal")
         assert data["nome"] == "Buteco Minimal"
