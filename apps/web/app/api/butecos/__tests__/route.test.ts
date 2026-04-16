@@ -42,7 +42,7 @@ describe("POST /api/butecos", () => {
       new Request("http://localhost/api/butecos", {
         method: "POST",
         body: JSON.stringify({ butecoId: "1", action: "invalid" }),
-      }),
+      })
     );
 
     expect(response.status).toBe(400);
@@ -57,7 +57,7 @@ describe("POST /api/butecos", () => {
       new Request("http://localhost/api/butecos", {
         method: "POST",
         body: JSON.stringify({ butecoId: "1", action: "favoritar" }),
-      }),
+      })
     );
 
     expect(response.status).toBe(404);
@@ -72,7 +72,7 @@ describe("POST /api/butecos", () => {
       new Request("http://localhost/api/butecos", {
         method: "POST",
         body: JSON.stringify({ butecoId: "buteco-1", action: "favoritar" }),
-      }),
+      })
     );
 
     expect(response.status).toBe(200);
@@ -91,7 +91,7 @@ describe("POST /api/butecos", () => {
       new Request("http://localhost/api/butecos", {
         method: "POST",
         body: JSON.stringify({ butecoId: "buteco-1", action: "desfavoritar" }),
-      }),
+      })
     );
 
     expect(prisma.favorito.deleteMany).toHaveBeenCalledWith({
@@ -107,7 +107,7 @@ describe("POST /api/butecos", () => {
       new Request("http://localhost/api/butecos", {
         method: "POST",
         body: JSON.stringify({ butecoId: "buteco-1", action: "visitar" }),
-      }),
+      })
     );
 
     expect(prisma.visita.upsert).toHaveBeenCalledWith({
