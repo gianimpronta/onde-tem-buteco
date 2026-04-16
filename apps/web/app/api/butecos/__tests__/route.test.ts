@@ -29,7 +29,7 @@ describe("POST /api/butecos", () => {
   it("returns 401 when unauthenticated", async () => {
     auth.mockResolvedValue(null);
 
-    const response = await POST(new Request("http://localhost/api/butecos", { method: "POST" }));
+    const response = await POST(new Request("https://localhost/api/butecos", { method: "POST" }));
 
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({ error: "Não autorizado" });
@@ -39,7 +39,7 @@ describe("POST /api/butecos", () => {
     auth.mockResolvedValue({ user: { email: "test@example.com" } });
 
     const response = await POST(
-      new Request("http://localhost/api/butecos", {
+      new Request("https://localhost/api/butecos", {
         method: "POST",
         body: JSON.stringify({ butecoId: "1", action: "invalid" }),
       })
@@ -54,7 +54,7 @@ describe("POST /api/butecos", () => {
     prisma.user.findUnique.mockResolvedValue(null);
 
     const response = await POST(
-      new Request("http://localhost/api/butecos", {
+      new Request("https://localhost/api/butecos", {
         method: "POST",
         body: JSON.stringify({ butecoId: "1", action: "favoritar" }),
       })
@@ -69,7 +69,7 @@ describe("POST /api/butecos", () => {
     prisma.user.findUnique.mockResolvedValue({ id: "user-1" });
 
     const response = await POST(
-      new Request("http://localhost/api/butecos", {
+      new Request("https://localhost/api/butecos", {
         method: "POST",
         body: JSON.stringify({ butecoId: "buteco-1", action: "favoritar" }),
       })
@@ -88,7 +88,7 @@ describe("POST /api/butecos", () => {
     prisma.user.findUnique.mockResolvedValue({ id: "user-1" });
 
     await POST(
-      new Request("http://localhost/api/butecos", {
+      new Request("https://localhost/api/butecos", {
         method: "POST",
         body: JSON.stringify({ butecoId: "buteco-1", action: "desfavoritar" }),
       })
@@ -104,7 +104,7 @@ describe("POST /api/butecos", () => {
     prisma.user.findUnique.mockResolvedValue({ id: "user-1" });
 
     await POST(
-      new Request("http://localhost/api/butecos", {
+      new Request("https://localhost/api/butecos", {
         method: "POST",
         body: JSON.stringify({ butecoId: "buteco-1", action: "visitar" }),
       })
