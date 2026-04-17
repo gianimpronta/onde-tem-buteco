@@ -1,8 +1,15 @@
+import dynamicImport from "next/dynamic";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { MapaButecos } from "@/components/mapa/mapa-butecos";
 
 export const dynamic = "force-dynamic";
+
+const MapaButecos = dynamicImport(
+  () => import("@/components/mapa/mapa-butecos").then((module) => module.MapaButecos),
+  {
+    ssr: false,
+  }
+);
 
 type ButecoComCoordenada = {
   slug: string;
