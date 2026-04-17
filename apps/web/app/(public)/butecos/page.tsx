@@ -42,6 +42,10 @@ export default async function ButecosPage({
   const activeFiltersCount = countActiveButecoFilters(filters);
   const cidadeOptions = cidades.map(({ cidade }) => cidade);
   const bairroOptions = bairros.flatMap(({ bairro }) => (bairro ? [bairro] : []));
+  const activeFiltersLabel =
+    activeFiltersCount > 0
+      ? ` com ${activeFiltersCount} filtro${activeFiltersCount === 1 ? "" : "s"}`
+      : "";
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6">
@@ -53,14 +57,14 @@ export default async function ButecosPage({
             </p>
             <h1 className="mt-1 text-3xl font-black tracking-tight text-zinc-900">Botecos</h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 sm:text-base">
-              Refine a lista por cidade, bairro ou busca textual para encontrar um petisco ou
-              boteco com mais rapidez.
+              Refine a lista por cidade, bairro ou busca textual para encontrar um petisco ou boteco
+              com mais rapidez.
             </p>
           </div>
 
           <div className="inline-flex items-center rounded-full bg-zinc-100 px-4 py-2 text-sm font-semibold text-zinc-700">
             {butecos.length} resultado{butecos.length === 1 ? "" : "s"}
-            {activeFiltersCount > 0 ? ` com ${activeFiltersCount} filtro${activeFiltersCount === 1 ? "" : "s"}` : ""}
+            {activeFiltersLabel}
           </div>
         </div>
       </section>
