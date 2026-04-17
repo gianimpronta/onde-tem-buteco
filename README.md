@@ -106,6 +106,14 @@ pip install -r requirements.txt
 DATABASE_URL=<url> python main.py
 ```
 
+Para reprocessar apenas os butecos que já estão no banco sem `lat/lng`:
+
+```bash
+cd scraper
+pip install -r requirements.txt
+DATABASE_URL=<url> python main.py --skip-scrape --backfill-missing-geocodes
+```
+
 ---
 
 ## Variáveis de ambiente necessárias
