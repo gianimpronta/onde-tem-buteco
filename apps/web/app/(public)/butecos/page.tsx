@@ -42,10 +42,9 @@ export default async function ButecosPage({
   const activeFiltersCount = countActiveButecoFilters(filters);
   const cidadeOptions = cidades.map(({ cidade }) => cidade);
   const bairroOptions = bairros.flatMap(({ bairro }) => (bairro ? [bairro] : []));
+  const activeFiltersSuffix = activeFiltersCount === 1 ? "" : "s";
   const activeFiltersLabel =
-    activeFiltersCount > 0
-      ? ` com ${activeFiltersCount} filtro${activeFiltersCount === 1 ? "" : "s"}`
-      : "";
+    activeFiltersCount > 0 ? ` com ${activeFiltersCount} filtro${activeFiltersSuffix}` : "";
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6">
