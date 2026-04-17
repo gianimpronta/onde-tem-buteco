@@ -1,4 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool, type PoolConfig } from "pg";
 import { PrismaClient } from "@/app/generated/prisma/client";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
@@ -11,8 +12,20 @@ function createPrismaClient() {
     throw new Error("DATABASE_URL, POSTGRES_URL ou POSTGRES_PRISMA_URL precisam estar definidos.");
   }
 
-  const adapter = new PrismaPg({ connectionString });
+  const adapter = new PrismaPg(createPool(connectionString));
   return new PrismaClient({ adapter });
+}
+
+function createPool(connectionString: string) {
+  const connectionUrl = new URL(connectionString);
+  const sslMode = connectionUrl.searchParams.get("sslmode");
+  const poolConfig: PoolConfig = { connectionString };
+
+  if (sslMode !== "disable") {
+    poolConfig.ssl = { rejectUnauthorized: false };
+  }
+
+  return new Pool(poolConfig);
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
