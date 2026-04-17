@@ -1,15 +1,8 @@
-import dynamicImport from "next/dynamic";
 import Link from "next/link";
+import { MapaButecosShell } from "@/components/mapa/mapa-butecos-shell";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
-
-const MapaButecos = dynamicImport(
-  () => import("@/components/mapa/mapa-butecos").then((module) => module.MapaButecos),
-  {
-    ssr: false,
-  }
-);
 
 type ButecoComCoordenada = {
   slug: string;
@@ -99,7 +92,7 @@ export default async function Home() {
       </section>
 
       <section aria-label="Mapa de botecos" className="pb-6">
-        <MapaButecos butecos={butecosComMapa} />
+        <MapaButecosShell butecos={butecosComMapa} />
       </section>
     </main>
   );
