@@ -6,10 +6,15 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 function createPrismaClient() {
   const connectionString =
-    process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? process.env.POSTGRES_PRISMA_URL;
+    process.env.POSTGRES_URL_NON_POOLING ??
+    process.env.POSTGRES_URL ??
+    process.env.POSTGRES_PRISMA_URL ??
+    process.env.DATABASE_URL;
 
   if (!connectionString) {
-    throw new Error("DATABASE_URL, POSTGRES_URL ou POSTGRES_PRISMA_URL precisam estar definidos.");
+    throw new Error(
+      "POSTGRES_URL_NON_POOLING, POSTGRES_URL, POSTGRES_PRISMA_URL ou DATABASE_URL precisam estar definidos."
+    );
   }
 
   const adapter = new PrismaPg(createPool(connectionString));
