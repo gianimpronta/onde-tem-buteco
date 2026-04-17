@@ -182,8 +182,14 @@ def _build_geocode_queries(
 
 def _sanitize_database_url(url: str) -> str:
     parts = urlsplit(url)
-    filtered_query = [(key, value) for key, value in parse_qsl(parts.query, keep_blank_values=True) if key != "pgbouncer"]
-    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(filtered_query), parts.fragment))
+    filtered_query = [
+        (key, value)
+        for key, value in parse_qsl(parts.query, keep_blank_values=True)
+        if key != "pgbouncer"
+    ]
+    return urlunsplit(
+        (parts.scheme, parts.netloc, parts.path, urlencode(filtered_query), parts.fragment)
+    )
 
 
 def resolve_database_url() -> str:
@@ -193,7 +199,8 @@ def resolve_database_url() -> str:
             return _sanitize_database_url(raw_url)
 
     raise RuntimeError(
-        "Configure POSTGRES_URL_NON_POOLING, DATABASE_URL ou POSTGRES_PRISMA_URL antes de rodar o scraper"
+        "Configure POSTGRES_URL_NON_POOLING, DATABASE_URL "
+        "ou POSTGRES_PRISMA_URL antes de rodar o scraper"
     )
 
 
@@ -395,7 +402,9 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.backfill_missing_geocodes:
         print(
-            f"Backfill: {backfill_updated} butecos geolocalizados, {backfill_failed} ainda pendentes."
+            "Backfill: "
+            f"{backfill_updated} butecos geolocalizados, "
+            f"{backfill_failed} ainda pendentes."
         )
 
     if should_exit_with_error(
