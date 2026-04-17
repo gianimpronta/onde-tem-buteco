@@ -137,11 +137,10 @@ def _normalize_address(endereco: str) -> str:
     normalized = _normalize_whitespace(endereco)
     normalized = normalized.replace("|", ", ")
     normalized = re.sub(r"\bCEP[:\s-]*\d{5}-?\d{3}\b", "", normalized, flags=re.IGNORECASE)
-    normalized = re.sub(r"\s+[–-]\s+([A-Z]{2})$", r", \1", normalized)
-    normalized = re.sub(r"\s*-\s*", ", ", normalized)
-    normalized = re.sub(r"\s*,\s*", ", ", normalized)
-    normalized = re.sub(r"(,\s*){2,}", ", ", normalized)
-    return normalized.strip(" ,")
+    normalized = normalized.replace(" – ", ", ")
+    normalized = normalized.replace(" - ", ", ")
+    parts = [part.strip() for part in normalized.split(",") if part.strip()]
+    return ", ".join(parts)
 
 
 def _build_geocode_queries(
