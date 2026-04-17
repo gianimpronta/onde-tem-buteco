@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { MapaButecosShell } from "@/components/mapa/mapa-butecos-shell";
 import { prisma } from "@/lib/prisma";
-import { MapaButecos } from "@/components/mapa/mapa-butecos";
 
 export const dynamic = "force-dynamic";
 
@@ -92,7 +92,7 @@ export default async function Home() {
       </section>
 
       <section aria-label="Mapa de botecos" className="pb-6">
-        <MapaButecos butecos={butecosComMapa} />
+        <MapaButecosShell butecos={butecosComMapa} />
       </section>
     </main>
   );
