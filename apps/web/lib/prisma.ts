@@ -27,6 +27,8 @@ function createPool(connectionString: string) {
   const poolConfig: PoolConfig = { connectionString };
 
   if (sslMode !== "disable") {
+    connectionUrl.searchParams.delete("sslmode");
+    poolConfig.connectionString = connectionUrl.toString();
     poolConfig.ssl = { rejectUnauthorized: false };
   }
 
