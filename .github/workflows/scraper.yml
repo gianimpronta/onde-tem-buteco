@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: "0 6 * * 1"
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "Modo de execucao"
+        required: true
+        default: "backfill-only"
+        type: choice
+        options:
+          - backfill-only
+          - scrape-and-backfill
 
 # Mínimo de permissões para o GITHUB_TOKEN — o scraper não precisa escrever no repo
 permissions:
@@ -49,7 +58,13 @@ jobs:
 
       # O secret nunca é impresso — passado apenas como variável de ambiente
       # do processo filho, não aparece em logs nem em env do runner principal
-      - name: Rodar scraper
+      - name: Rodar scraper ou backfill
         env:
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
-        run: python scraper/main.py
+          SCRAPER_MODE: ${{ github.event.inputs.mode || 'scrape-and-backfill' }}
+        run: |
+          if [ "$SCRAPER_MODE" = "backfill-only" ]; then
+            python scraper/main.py --skip-scrape --backfill-missing-geocodes
+          else
+            python scraper/main.py --backfill-missing-geocodes
+          fi
