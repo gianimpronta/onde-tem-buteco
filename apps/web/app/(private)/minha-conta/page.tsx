@@ -18,20 +18,25 @@ export default async function MinhaContaPage() {
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8 space-y-10">
-      <h1 className="text-3xl font-bold">Minha Conta</h1>
+      <h1 className="text-3xl font-bold dark:text-zinc-50">Minha Conta</h1>
 
       <section>
-        <h2 className="text-xl font-semibold mb-4">Favoritos</h2>
+        <h2 className="text-xl font-semibold mb-4 dark:text-zinc-100">Favoritos</h2>
         {user.favoritos.length === 0 ? (
-          <p className="text-zinc-500">Nenhum favorito ainda.</p>
+          <p className="text-zinc-500 dark:text-zinc-400">Nenhum favorito ainda.</p>
         ) : (
           <ul className="space-y-2">
             {user.favoritos.map(({ buteco }) => (
               <li key={buteco.slug}>
-                <a href={`/butecos/${buteco.slug}`} className="font-medium hover:underline">
+                <a
+                  href={`/butecos/${buteco.slug}`}
+                  className="font-medium hover:underline dark:text-zinc-200"
+                >
                   {buteco.nome}
                 </a>
-                <span className="text-zinc-500 text-sm ml-2">{buteco.cidade}</span>
+                <span className="text-zinc-500 text-sm ml-2 dark:text-zinc-400">
+                  {buteco.cidade}
+                </span>
               </li>
             ))}
           </ul>
@@ -39,17 +44,20 @@ export default async function MinhaContaPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold mb-4">Visitados</h2>
+        <h2 className="text-xl font-semibold mb-4 dark:text-zinc-100">Visitados</h2>
         {user.visitas.length === 0 ? (
-          <p className="text-zinc-500">Nenhuma visita registrada.</p>
+          <p className="text-zinc-500 dark:text-zinc-400">Nenhuma visita registrada.</p>
         ) : (
           <ul className="space-y-2">
             {user.visitas.map(({ buteco, visitadoEm }) => (
               <li key={buteco.slug}>
-                <a href={`/butecos/${buteco.slug}`} className="font-medium hover:underline">
+                <a
+                  href={`/butecos/${buteco.slug}`}
+                  className="font-medium hover:underline dark:text-zinc-200"
+                >
                   {buteco.nome}
                 </a>
-                <span className="text-zinc-500 text-sm ml-2">
+                <span className="text-zinc-500 text-sm ml-2 dark:text-zinc-400">
                   {visitadoEm.toLocaleDateString("pt-BR")}
                 </span>
               </li>
