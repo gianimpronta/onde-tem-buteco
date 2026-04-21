@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import {
   buildButecoWhere,
   countActiveButecoFilters,
   normalizeButecoFilters,
 } from "@/lib/buteco-filters";
+import { ButecosFilterForm } from "@/components/butecos/filter-form";
 import { prisma } from "@/lib/prisma";
 
 export default async function ButecosPage({
@@ -69,64 +71,9 @@ export default async function ButecosPage({
       </section>
 
       <section className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-        <form className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_auto_auto] lg:items-end">
-          <label className="flex min-w-0 flex-col gap-2 sm:col-span-2 lg:col-span-1">
-            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Buscar</span>
-            <input
-              name="q"
-              defaultValue={filters.q ?? ""}
-              placeholder="Nome do buteco ou petisco"
-              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:border-amber-500"
-            />
-          </label>
-
-          <label className="flex min-w-0 flex-col gap-2">
-            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Cidade</span>
-            <select
-              name="cidade"
-              defaultValue={filters.cidade ?? ""}
-              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:border-amber-500"
-            >
-              <option value="">Todas as cidades</option>
-              {cidadeOptions.map((cidade) => (
-                <option key={cidade} value={cidade}>
-                  {cidade}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="flex min-w-0 flex-col gap-2">
-            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Bairro</span>
-            <select
-              name="bairro"
-              defaultValue={filters.bairro ?? ""}
-              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:border-amber-500 dark:disabled:bg-zinc-700 dark:disabled:text-zinc-500"
-              disabled={bairroOptions.length === 0}
-            >
-              <option value="">Todos os bairros</option>
-              {bairroOptions.map((bairro) => (
-                <option key={bairro} value={bairro}>
-                  {bairro}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <button
-            type="submit"
-            className="rounded-2xl bg-amber-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
-          >
-            Aplicar filtros
-          </button>
-
-          <Link
-            href="/butecos"
-            className="rounded-2xl border border-zinc-200 px-5 py-3 text-center text-sm font-semibold text-zinc-700 transition hover:border-amber-300 hover:bg-amber-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-amber-600 dark:hover:bg-amber-900/20"
-          >
-            Limpar
-          </Link>
-        </form>
+        <Suspense>
+          <ButecosFilterForm cidadeOptions={cidadeOptions} bairroOptions={bairroOptions} />
+        </Suspense>
 
         {filters.cidade && bairroOptions.length === 0 ? (
           <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
