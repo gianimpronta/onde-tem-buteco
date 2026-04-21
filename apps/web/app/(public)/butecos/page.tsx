@@ -69,23 +69,23 @@ export default async function ButecosPage({
       </section>
 
       <section className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <form className="grid gap-4 lg:grid-cols-[1.2fr_1fr_1fr_auto_auto] lg:items-end">
-          <label className="flex flex-col gap-2">
+        <form className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_auto_auto] lg:items-end">
+          <label className="flex min-w-0 flex-col gap-2 sm:col-span-2 lg:col-span-1">
             <span className="text-sm font-semibold text-zinc-800">Buscar</span>
             <input
               name="q"
               defaultValue={filters.q ?? ""}
               placeholder="Nome do buteco ou petisco"
-              className="rounded-2xl border border-zinc-200 px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400"
+              className="w-full rounded-2xl border border-zinc-200 px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400"
             />
           </label>
 
-          <label className="flex flex-col gap-2">
+          <label className="flex min-w-0 flex-col gap-2">
             <span className="text-sm font-semibold text-zinc-800">Cidade</span>
             <select
               name="cidade"
               defaultValue={filters.cidade ?? ""}
-              className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400"
+              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400"
             >
               <option value="">Todas as cidades</option>
               {cidadeOptions.map((cidade) => (
@@ -96,12 +96,12 @@ export default async function ButecosPage({
             </select>
           </label>
 
-          <label className="flex flex-col gap-2">
+          <label className="flex min-w-0 flex-col gap-2">
             <span className="text-sm font-semibold text-zinc-800">Bairro</span>
             <select
               name="bairro"
               defaultValue={filters.bairro ?? ""}
-              className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400"
+              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400"
               disabled={bairroOptions.length === 0}
             >
               <option value="">Todos os bairros</option>
