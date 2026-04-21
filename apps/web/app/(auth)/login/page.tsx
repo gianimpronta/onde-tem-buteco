@@ -3,7 +3,7 @@ import { signIn } from "@/lib/auth";
 export default function LoginPage() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen gap-6">
-      <h1 className="text-2xl font-bold">Entrar</h1>
+      <h1 className="text-2xl font-bold dark:text-zinc-50">Entrar</h1>
       <form
         action={async () => {
           "use server";
