@@ -57,7 +57,9 @@ export default async function ButecosPage({
             <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
               Explorar botecos
             </p>
-            <h1 className="mt-1 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">Botecos</h1>
+            <h1 className="mt-1 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
+              Botecos
+            </h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-base">
               Refine a lista por cidade, bairro ou busca textual para encontrar um petisco ou boteco
               com mais rapidez.
@@ -85,7 +87,9 @@ export default async function ButecosPage({
 
       {butecos.length === 0 ? (
         <section className="rounded-3xl border border-dashed border-zinc-300 bg-zinc-50 px-6 py-12 text-center dark:border-zinc-700 dark:bg-zinc-900/50">
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Nenhum boteco encontrado</h2>
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+            Nenhum boteco encontrado
+          </h2>
           <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
             Tente ajustar os filtros ou limpar a busca para ver mais participantes.
           </p>
@@ -118,9 +122,13 @@ export default async function ButecosPage({
                   {b.cidade}
                 </p>
                 {b.petiscoNome ? (
-                  <p className="mt-3 text-sm font-medium text-amber-700 dark:text-amber-400">{b.petiscoNome}</p>
+                  <p className="mt-3 text-sm font-medium text-amber-700 dark:text-amber-400">
+                    {b.petiscoNome}
+                  </p>
                 ) : (
-                  <p className="mt-3 text-sm text-zinc-400 dark:text-zinc-500">Petisco ainda não informado</p>
+                  <p className="mt-3 text-sm text-zinc-400 dark:text-zinc-500">
+                    Petisco ainda não informado
+                  </p>
                 )}
               </Link>
             </li>

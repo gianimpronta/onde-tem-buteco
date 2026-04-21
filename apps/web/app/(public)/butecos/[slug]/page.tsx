@@ -16,7 +16,10 @@ export default async function ButecoPage({
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
-      <Link href="/butecos" className="text-sm text-zinc-500 hover:underline mb-4 block dark:text-zinc-400">
+      <Link
+        href="/butecos"
+        className="text-sm text-zinc-500 hover:underline mb-4 block dark:text-zinc-400"
+      >
         ← Voltar
       </Link>
       {buteco.fotoUrl && (
@@ -36,7 +39,9 @@ export default async function ButecoPage({
       {buteco.petiscoNome && (
         <div className="mt-6">
           <h2 className="font-semibold text-amber-600 dark:text-amber-400">{buteco.petiscoNome}</h2>
-          {buteco.petiscoDesc && <p className="text-zinc-600 mt-1 dark:text-zinc-400">{buteco.petiscoDesc}</p>}
+          {buteco.petiscoDesc && (
+            <p className="text-zinc-600 mt-1 dark:text-zinc-400">{buteco.petiscoDesc}</p>
+          )}
         </div>
       )}
       <div className="mt-6 space-y-1 text-sm text-zinc-500 dark:text-zinc-400">
