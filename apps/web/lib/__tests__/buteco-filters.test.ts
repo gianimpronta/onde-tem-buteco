@@ -49,4 +49,37 @@ describe("buteco-filters", () => {
       })
     ).toBe(2);
   });
+
+  it("counts all three active filters", () => {
+    expect(
+      countActiveButecoFilters({
+        cidade: "Belo Horizonte",
+        bairro: "Centro",
+        q: "torresmo",
+      })
+    ).toBe(3);
+  });
+
+  it("returns zero when all filters are empty or whitespace", () => {
+    expect(countActiveButecoFilters({ cidade: "  ", bairro: "", q: undefined })).toBe(0);
+  });
+
+  it("builds where clause with only q, no city or neighborhood", () => {
+    expect(buildButecoWhere({ q: "feijoada" })).toEqual({
+      OR: [
+        { nome: { contains: "feijoada", mode: "insensitive" } },
+        { petiscoNome: { contains: "feijoada", mode: "insensitive" } },
+      ],
+    });
+  });
+
+  it("builds where clause with only city, no neighborhood or q", () => {
+    expect(buildButecoWhere({ cidade: "São Paulo" })).toEqual({ cidade: "São Paulo" });
+  });
+
+  it("ignores bairro when city is not set (whitespace city)", () => {
+    expect(buildButecoWhere({ cidade: "   ", bairro: "Centro" })).toEqual({
+      bairro: "Centro",
+    });
+  });
 });
