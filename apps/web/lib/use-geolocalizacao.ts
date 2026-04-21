@@ -45,7 +45,7 @@ export function useGeolocalizacao(): GeolocalizacaoState {
         }
         setCarregando(false);
       },
-      { timeout: 10000, maximumAge: 60000 },
+      { timeout: 10000, maximumAge: 60000 }
     );
   }, []);
 
