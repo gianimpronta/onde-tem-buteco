@@ -28,10 +28,15 @@ export default async function MinhaContaPage() {
           <ul className="space-y-2">
             {user.favoritos.map(({ buteco }) => (
               <li key={buteco.slug}>
-                <a href={`/butecos/${buteco.slug}`} className="font-medium hover:underline dark:text-zinc-200">
+                <a
+                  href={`/butecos/${buteco.slug}`}
+                  className="font-medium hover:underline dark:text-zinc-200"
+                >
                   {buteco.nome}
                 </a>
-                <span className="text-zinc-500 text-sm ml-2 dark:text-zinc-400">{buteco.cidade}</span>
+                <span className="text-zinc-500 text-sm ml-2 dark:text-zinc-400">
+                  {buteco.cidade}
+                </span>
               </li>
             ))}
           </ul>
@@ -46,7 +51,10 @@ export default async function MinhaContaPage() {
           <ul className="space-y-2">
             {user.visitas.map(({ buteco, visitadoEm }) => (
               <li key={buteco.slug}>
-                <a href={`/butecos/${buteco.slug}`} className="font-medium hover:underline dark:text-zinc-200">
+                <a
+                  href={`/butecos/${buteco.slug}`}
+                  className="font-medium hover:underline dark:text-zinc-200"
+                >
                   {buteco.nome}
                 </a>
                 <span className="text-zinc-500 text-sm ml-2 dark:text-zinc-400">
