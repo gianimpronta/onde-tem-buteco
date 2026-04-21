@@ -7,7 +7,6 @@ import {
 } from "@/lib/buteco-filters";
 import { ButecosFilterForm } from "@/components/butecos/filter-form";
 import { prisma } from "@/lib/prisma";
-import { ButecosFilterForm } from "@/components/butecos/filter-form";
 
 export default async function ButecosPage({
   searchParams,
