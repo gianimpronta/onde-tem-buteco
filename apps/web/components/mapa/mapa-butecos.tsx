@@ -28,9 +28,9 @@ type MapaButecosProps = {
 export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
   if (butecos.length === 0) {
     return (
-      <div className="flex min-h-[42vh] w-full flex-col items-center justify-center rounded-3xl border border-zinc-200 bg-white px-6 py-12 text-center shadow-sm sm:min-h-[48vh]">
-        <p className="text-xl font-bold text-zinc-900 sm:text-2xl">Mapa em atualização</p>
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-600 sm:text-base">
+      <div className="flex min-h-[42vh] w-full flex-col items-center justify-center rounded-3xl border border-zinc-200 bg-white px-6 py-12 text-center shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:min-h-[48vh]">
+        <p className="text-xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-2xl">Mapa em atualização</p>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-base">
           Ainda não existem botecos com geolocalização disponível. Enquanto isso, você já pode conferir a lista
           completa dos participantes.
         </p>
@@ -45,7 +45,7 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
   }
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
       <MapContainer
         center={defaultCenter}
         zoom={12}

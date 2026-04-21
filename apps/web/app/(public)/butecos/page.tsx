@@ -48,44 +48,44 @@ export default async function ButecosPage({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6">
-      <section className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <section className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
               Explorar botecos
             </p>
-            <h1 className="mt-1 text-3xl font-black tracking-tight text-zinc-900">Botecos</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 sm:text-base">
+            <h1 className="mt-1 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">Botecos</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-base">
               Refine a lista por cidade, bairro ou busca textual para encontrar um petisco ou boteco
               com mais rapidez.
             </p>
           </div>
 
-          <div className="inline-flex items-center rounded-full bg-zinc-100 px-4 py-2 text-sm font-semibold text-zinc-700">
+          <div className="inline-flex items-center rounded-full bg-zinc-100 px-4 py-2 text-sm font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
             {butecos.length} resultado{butecos.length === 1 ? "" : "s"}
             {activeFiltersLabel}
           </div>
         </div>
       </section>
 
-      <section className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <section className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
         <form className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_auto_auto] lg:items-end">
           <label className="flex min-w-0 flex-col gap-2 sm:col-span-2 lg:col-span-1">
-            <span className="text-sm font-semibold text-zinc-800">Buscar</span>
+            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Buscar</span>
             <input
               name="q"
               defaultValue={filters.q ?? ""}
               placeholder="Nome do buteco ou petisco"
-              className="w-full rounded-2xl border border-zinc-200 px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400"
+              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:border-amber-500"
             />
           </label>
 
           <label className="flex min-w-0 flex-col gap-2">
-            <span className="text-sm font-semibold text-zinc-800">Cidade</span>
+            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Cidade</span>
             <select
               name="cidade"
               defaultValue={filters.cidade ?? ""}
-              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400"
+              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:border-amber-500"
             >
               <option value="">Todas as cidades</option>
               {cidadeOptions.map((cidade) => (
@@ -97,11 +97,11 @@ export default async function ButecosPage({
           </label>
 
           <label className="flex min-w-0 flex-col gap-2">
-            <span className="text-sm font-semibold text-zinc-800">Bairro</span>
+            <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Bairro</span>
             <select
               name="bairro"
               defaultValue={filters.bairro ?? ""}
-              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400"
+              className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:border-amber-500 dark:disabled:bg-zinc-700 dark:disabled:text-zinc-500"
               disabled={bairroOptions.length === 0}
             >
               <option value="">Todos os bairros</option>
@@ -122,23 +122,23 @@ export default async function ButecosPage({
 
           <Link
             href="/butecos"
-            className="rounded-2xl border border-zinc-200 px-5 py-3 text-center text-sm font-semibold text-zinc-700 transition hover:border-amber-300 hover:bg-amber-50"
+            className="rounded-2xl border border-zinc-200 px-5 py-3 text-center text-sm font-semibold text-zinc-700 transition hover:border-amber-300 hover:bg-amber-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-amber-600 dark:hover:bg-amber-900/20"
           >
             Limpar
           </Link>
         </form>
 
         {filters.cidade && bairroOptions.length === 0 ? (
-          <p className="mt-4 text-sm text-zinc-500">
-            Ainda nÃ£o existem bairros cadastrados para a cidade selecionada.
+          <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+            Ainda não existem bairros cadastrados para a cidade selecionada.
           </p>
         ) : null}
       </section>
 
       {butecos.length === 0 ? (
-        <section className="rounded-3xl border border-dashed border-zinc-300 bg-zinc-50 px-6 py-12 text-center">
-          <h2 className="text-xl font-bold text-zinc-900">Nenhum boteco encontrado</h2>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+        <section className="rounded-3xl border border-dashed border-zinc-300 bg-zinc-50 px-6 py-12 text-center dark:border-zinc-700 dark:bg-zinc-900/50">
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">Nenhum boteco encontrado</h2>
+          <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
             Tente ajustar os filtros ou limpar a busca para ver mais participantes.
           </p>
           <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
@@ -150,7 +150,7 @@ export default async function ButecosPage({
             </Link>
             <Link
               href="/"
-              className="rounded-full border border-zinc-200 px-5 py-2.5 text-sm font-semibold text-zinc-700 transition hover:border-amber-300 hover:bg-amber-50"
+              className="rounded-full border border-zinc-200 px-5 py-2.5 text-sm font-semibold text-zinc-700 transition hover:border-amber-300 hover:bg-amber-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-amber-600 dark:hover:bg-amber-900/20"
             >
               Voltar para a home
             </Link>
@@ -162,17 +162,17 @@ export default async function ButecosPage({
             <li key={b.slug}>
               <Link
                 href={`/butecos/${b.slug}`}
-                className="block rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-400"
+                className="block rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-400 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-amber-500"
               >
-                <p className="text-lg font-bold text-zinc-900">{b.nome}</p>
-                <p className="mt-1 text-sm text-zinc-500">
+                <p className="text-lg font-bold text-zinc-900 dark:text-zinc-50">{b.nome}</p>
+                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                   {b.bairro ? `${b.bairro}, ` : ""}
                   {b.cidade}
                 </p>
                 {b.petiscoNome ? (
-                  <p className="mt-3 text-sm font-medium text-amber-700">{b.petiscoNome}</p>
+                  <p className="mt-3 text-sm font-medium text-amber-700 dark:text-amber-400">{b.petiscoNome}</p>
                 ) : (
-                  <p className="mt-3 text-sm text-zinc-400">Petisco ainda nÃ£o informado</p>
+                  <p className="mt-3 text-sm text-zinc-400 dark:text-zinc-500">Petisco ainda não informado</p>
                 )}
               </Link>
             </li>
