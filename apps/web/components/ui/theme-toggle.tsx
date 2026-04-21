@@ -1,18 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+function getInitialThemeState(): boolean | null {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  return document.documentElement.classList.contains("dark");
+}
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
-  }, []);
+  const [isDark, setIsDark] = useState<boolean | null>(getInitialThemeState);
 
   function toggle() {
+    if (isDark === null) {
+      return;
+    }
+
     const next = !isDark;
     setIsDark(next);
     document.documentElement.classList.toggle("dark", next);
+
     try {
       localStorage.setItem("theme", next ? "dark" : "light");
     } catch {}
