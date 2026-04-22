@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { auth, signOut } from "@/lib/auth";
+import { isE2EFixtureMode } from "@/lib/public-butecos";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default async function Header() {
-  const session = await auth();
+  const session = isE2EFixtureMode() ? null : await import("@/lib/auth").then(({ auth }) => auth());
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pt-5 sm:px-6 sm:pt-8 lg:px-8">
@@ -36,6 +36,7 @@ export default async function Header() {
                 <form
                   action={async () => {
                     "use server";
+                    const { signOut } = await import("@/lib/auth");
                     await signOut({ redirectTo: "/" });
                   }}
                 >

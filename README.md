@@ -88,6 +88,17 @@ npm run dev
 
 Acesse [http://localhost:3000](http://localhost:3000).
 
+### 6. Rode os testes end-to-end
+
+```bash
+cd apps/web
+pnpm install
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
+Os testes e2e usam fixtures estáveis para os fluxos públicos e não dependem do banco real para a execução local ou em CI.
+
 ---
 
 ## Scraper
