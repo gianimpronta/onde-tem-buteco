@@ -33,10 +33,12 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
   if (butecos.length === 0) {
     return (
       <div className="flex min-h-[42vh] w-full flex-col items-center justify-center rounded-3xl border border-zinc-200 bg-white px-6 py-12 text-center shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:min-h-[48vh]">
-        <p className="text-xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-2xl">Mapa em atualização</p>
+        <p className="text-xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-2xl">
+          Mapa em atualização
+        </p>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-base">
-          Ainda não existem botecos com geolocalização disponível. Enquanto isso, você já pode conferir a lista
-          completa dos participantes.
+          Ainda não existem botecos com geolocalização disponível. Enquanto isso, você já pode
+          conferir a lista completa dos participantes.
         </p>
         <Link
           href="/butecos"
@@ -82,7 +84,10 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
                 <div className="space-y-1">
                   <p className="font-semibold">{buteco.nome}</p>
                   <p className="text-sm text-zinc-600">{buteco.bairro ?? "Bairro não informado"}</p>
-                  <Link href={`/butecos/${buteco.slug}`} className="text-sm text-amber-700 hover:underline">
+                  <Link
+                    href={`/butecos/${buteco.slug}`}
+                    className="text-sm text-amber-700 hover:underline"
+                  >
                     Ver detalhes
                   </Link>
                 </div>

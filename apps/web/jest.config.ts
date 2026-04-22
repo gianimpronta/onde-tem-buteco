@@ -11,12 +11,7 @@ const config: Config = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
   },
-  collectCoverageFrom: [
-    "app/api/**/*.ts",
-    "lib/**/*.ts",
-    "!lib/**/__tests__/**",
-    "!**/*.d.ts",
-  ],
+  collectCoverageFrom: ["app/api/**/*.ts", "lib/**/*.ts", "!lib/**/__tests__/**", "!**/*.d.ts"],
 };
 
 export default createJestConfig(config);

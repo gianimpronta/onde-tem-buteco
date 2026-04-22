@@ -8,7 +8,11 @@ export default async function ButecosPage({
   searchParams,
 }: Readonly<{ searchParams: Promise<{ cidade?: string; bairro?: string; q?: string }> }>) {
   const filters = normalizeButecoFilters(await searchParams);
-  const { cidades: cidadeOptions, bairros: bairroOptions, butecos } = await getButecosPageData(filters);
+  const {
+    cidades: cidadeOptions,
+    bairros: bairroOptions,
+    butecos,
+  } = await getButecosPageData(filters);
 
   const activeFiltersCount = countActiveButecoFilters(filters);
   const activeFiltersSuffix = activeFiltersCount === 1 ? "" : "s";

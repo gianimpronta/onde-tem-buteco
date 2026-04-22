@@ -109,7 +109,8 @@ function filterFixtureButecos(filters: ButecoSearchFilters): PublicButecoRecord[
     }
 
     return where.OR.some((condition) => {
-      const containsValue = "nome" in condition ? condition.nome?.contains : condition.petiscoNome?.contains;
+      const containsValue =
+        "nome" in condition ? condition.nome?.contains : condition.petiscoNome?.contains;
 
       if (!containsValue) {
         return false;
@@ -182,13 +183,15 @@ export async function getButecosPageData(filters: ButecoSearchFilters) {
   if (isE2EFixtureMode()) {
     const normalizedFilters = normalizeButecoFilters(filters);
     const filteredButecos = filterFixtureButecos(normalizedFilters);
-    const cidades = [...new Set(e2eFixtureButecos.map((buteco) => buteco.cidade))].sort((left, right) =>
-      left.localeCompare(right, "pt-BR")
+    const cidades = [...new Set(e2eFixtureButecos.map((buteco) => buteco.cidade))].sort(
+      (left, right) => left.localeCompare(right, "pt-BR")
     );
     const bairros = [
       ...new Set(
         e2eFixtureButecos
-          .filter((buteco) => !normalizedFilters.cidade || buteco.cidade === normalizedFilters.cidade)
+          .filter(
+            (buteco) => !normalizedFilters.cidade || buteco.cidade === normalizedFilters.cidade
+          )
           .flatMap((buteco) => (buteco.bairro ? [buteco.bairro] : []))
       ),
     ].sort((left, right) => left.localeCompare(right, "pt-BR"));
