@@ -29,13 +29,13 @@
 
 | Camada | Tecnologia |
 |---|---|
-| Framework | Next.js 15 (App Router) + TypeScript |
+| Framework | Next.js 16 (App Router) + TypeScript |
 | Estilização | Tailwind CSS |
 | ORM | Prisma |
 | Banco de dados | Vercel Postgres (Neon) |
 | Autenticação | NextAuth.js v5 (Google OAuth) |
 | Mapa | Leaflet.js |
-| Scraper | Python 3.12 + BeautifulSoup |
+| Scraper | Python 3.12 + BeautifulSoup + psycopg2 |
 | CI/CD | GitHub Actions |
 | Hospedagem | Vercel |
 
@@ -127,7 +127,19 @@ Veja o arquivo [`.env.example`](.env.example) para a lista completa com instruç
 1. Fork o repositório
 2. Crie uma branch: `git checkout -b feat/minha-feature`
 3. Commit seguindo [Conventional Commits](https://www.conventionalcommits.org/): `feat: adiciona filtro por bairro`
-4. Abra um Pull Request descrevendo o que foi feito e como testar
+4. Crie ou identifique a issue relacionada antes de abrir o PR
+5. Ao criar a issue, preencha `labels`, `milestone` e `project`
+6. Abra um Pull Request descrevendo o que foi feito e como testar
+7. No corpo do PR, vincule a issue com `Closes #numero`, `Fixes #numero` ou `Refs #numero`
+8. Preencha no PR os `labels`, `milestone` e `project` adequados
+
+### Convenções de GitHub
+
+- O project deve conter apenas issues como itens visíveis
+- Pull requests não devem permanecer como linhas próprias no project
+- O relacionamento entre issue e PR deve aparecer pela coluna `Linked pull requests`
+- Use `Closes` ou `Fixes` apenas no PR principal que realmente encerra a issue
+- Use `Refs` em PRs complementares que façam parte do mesmo trabalho, sem fechar a issue novamente
 
 Para agentes de IA e colaboradores: leia o [`CLAUDE.md`](CLAUDE.md) antes de começar.
 
