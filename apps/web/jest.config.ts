@@ -7,6 +7,7 @@ const config: Config = {
   coverageProvider: "v8",
   testEnvironment: "node",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+  testPathIgnorePatterns: ["<rootDir>/e2e/"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
   },

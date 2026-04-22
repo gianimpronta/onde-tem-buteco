@@ -1,49 +1,16 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import {
-  buildButecoWhere,
-  countActiveButecoFilters,
-  normalizeButecoFilters,
-} from "@/lib/buteco-filters";
 import { ButecosFilterForm } from "@/components/butecos/filter-form";
-import { prisma } from "@/lib/prisma";
+import { countActiveButecoFilters, normalizeButecoFilters } from "@/lib/buteco-filters";
+import { getButecosPageData } from "@/lib/public-butecos";
 
 export default async function ButecosPage({
   searchParams,
 }: Readonly<{ searchParams: Promise<{ cidade?: string; bairro?: string; q?: string }> }>) {
   const filters = normalizeButecoFilters(await searchParams);
-
-  const [cidades, bairros, butecos] = await Promise.all([
-    prisma.buteco.findMany({
-      select: { cidade: true },
-      distinct: ["cidade"],
-      orderBy: { cidade: "asc" },
-    }),
-    prisma.buteco.findMany({
-      where: {
-        bairro: { not: null },
-        ...(filters.cidade ? { cidade: filters.cidade } : {}),
-      },
-      select: { bairro: true },
-      distinct: ["bairro"],
-      orderBy: { bairro: "asc" },
-    }),
-    prisma.buteco.findMany({
-      where: buildButecoWhere(filters),
-      orderBy: { nome: "asc" },
-      select: {
-        slug: true,
-        nome: true,
-        cidade: true,
-        bairro: true,
-        petiscoNome: true,
-      },
-    }),
-  ]);
+  const { cidades: cidadeOptions, bairros: bairroOptions, butecos } = await getButecosPageData(filters);
 
   const activeFiltersCount = countActiveButecoFilters(filters);
-  const cidadeOptions = cidades.map(({ cidade }) => cidade);
-  const bairroOptions = bairros.flatMap(({ bairro }) => (bairro ? [bairro] : []));
   const activeFiltersSuffix = activeFiltersCount === 1 ? "" : "s";
   const activeFiltersLabel =
     activeFiltersCount > 0 ? ` com ${activeFiltersCount} filtro${activeFiltersSuffix}` : "";
