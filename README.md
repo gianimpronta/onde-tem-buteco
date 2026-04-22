@@ -27,17 +27,17 @@
 
 ## Stack
 
-| Camada | Tecnologia |
-|---|---|
-| Framework | Next.js 15 (App Router) + TypeScript |
-| Estilização | Tailwind CSS |
-| ORM | Prisma |
-| Banco de dados | Vercel Postgres (Neon) |
-| Autenticação | NextAuth.js v5 (Google OAuth) |
-| Mapa | Leaflet.js |
-| Scraper | Python 3.12 + BeautifulSoup |
-| CI/CD | GitHub Actions |
-| Hospedagem | Vercel |
+| Camada         | Tecnologia                           |
+| -------------- | ------------------------------------ |
+| Framework      | Next.js 15 (App Router) + TypeScript |
+| Estilização    | Tailwind CSS                         |
+| ORM            | Prisma                               |
+| Banco de dados | Vercel Postgres (Neon)               |
+| Autenticação   | NextAuth.js v5 (Google OAuth)        |
+| Mapa           | Leaflet.js                           |
+| Scraper        | Python 3.12 + BeautifulSoup          |
+| CI/CD          | GitHub Actions                       |
+| Hospedagem     | Vercel                               |
 
 ---
 

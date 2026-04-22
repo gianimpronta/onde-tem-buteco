@@ -222,6 +222,11 @@ docs: atualiza AGENTS.md com instruções do scraper
 - Descrever o que foi feito e como testar
 - Vercel cria preview deploy automático por PR
 
+### Antes de push
+- Sempre rodar `format`, `lint`, `test` e `e2e` antes de qualquer `git push`
+- Não fazer push com qualquer uma dessas etapas falhando
+- Ao descrever validação em PRs, incluir de forma objetiva que essas quatro etapas foram executadas
+
 ### Issues
 - Issues criadas por agentes de IA devem ser atribuídas a `@gianimpronta` no momento da criação
 - Ao desmembrar uma issue em sub-issues, manter a atribuição em `@gianimpronta` por padrão
