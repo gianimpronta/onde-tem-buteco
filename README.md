@@ -32,7 +32,7 @@
 | Framework      | Next.js 15 (App Router) + TypeScript |
 | Estilização    | Tailwind CSS                         |
 | ORM            | Prisma                               |
-| Banco de dados | Vercel Postgres (Neon)               |
+| Banco de dados | Supabase Postgres                    |
 | Autenticação   | NextAuth.js v5 (Google OAuth)        |
 | Mapa           | Leaflet.js                           |
 | Scraper        | Python 3.12 + BeautifulSoup          |
@@ -47,7 +47,7 @@
 
 - Node.js 20+
 - Python 3.12+
-- Uma instância PostgreSQL (local ou Neon free tier)
+- Uma instância PostgreSQL (local ou Supabase)
 
 ### 1. Clone o repositório
 
@@ -130,6 +130,52 @@ DATABASE_URL=<url> python main.py --skip-scrape --backfill-missing-geocodes
 ## Variáveis de ambiente necessárias
 
 Veja o arquivo [`.env.example`](.env.example) para a lista completa com instruções de onde obter cada valor.
+
+## Comandos úteis de infraestrutura
+
+### Vercel
+
+```bash
+vercel link
+vercel env pull .env.local
+vercel pull
+```
+
+- `vercel link`: vincula o diretório local ao projeto da Vercel
+- `vercel env pull .env.local`: baixa as variáveis do projeto para uso local
+- `vercel pull`: sincroniza variáveis e configurações do projeto em `.vercel/`
+
+### Supabase
+
+```bash
+supabase link --project-ref <project-ref>
+supabase db pull
+supabase db push
+supabase secrets set --env-file .env.local
+```
+
+- `supabase link --project-ref <project-ref>`: vincula o projeto local ao projeto remoto no Supabase
+- `supabase db pull`: puxa o estado remoto do banco para o fluxo local de schema/migrations
+- `supabase db push`: aplica migrations locais no banco remoto vinculado
+- `supabase secrets set --env-file .env.local`: envia segredos para o projeto remoto quando necessário
+
+### GitHub
+
+```bash
+gh auth status
+gh issue view 73
+gh issue create
+gh pr create --draft
+gh pr view --web
+gh run list
+```
+
+- `gh auth status`: confirma a autenticação atual no GitHub CLI
+- `gh issue view <numero>`: consulta uma issue existente
+- `gh issue create`: cria uma nova issue
+- `gh pr create --draft`: abre um pull request em draft
+- `gh pr view --web`: abre o PR atual no navegador
+- `gh run list`: lista execuções recentes de GitHub Actions
 
 ---
 

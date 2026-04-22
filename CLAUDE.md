@@ -32,7 +32,7 @@ devem ser alterados manualmente no banco.
 | Framework | Next.js 16 (App Router) + TypeScript |
 | Estilização | Tailwind CSS |
 | ORM | Prisma |
-| Banco de dados | Vercel Postgres (Neon) |
+| Banco de dados | Supabase Postgres |
 | Autenticação | NextAuth.js v5 (Google OAuth) |
 | Mapa | Leaflet.js |
 | Scraper | Python 3.12 + BeautifulSoup + psycopg2 |
@@ -155,6 +155,27 @@ GOOGLE_CLIENT_SECRET=
 
 O scraper usa apenas `DATABASE_URL`, injetada via GitHub Actions Secret.
 
+## Comandos úteis de infraestrutura
+
+### Vercel
+- `vercel link`
+- `vercel env pull .env.local`
+- `vercel pull`
+
+### Supabase
+- `supabase link --project-ref <project-ref>`
+- `supabase db pull`
+- `supabase db push`
+- `supabase secrets set --env-file .env.local`
+
+### GitHub
+- `gh auth status`
+- `gh issue view <numero>`
+- `gh issue create`
+- `gh pr create --draft`
+- `gh pr view --web`
+- `gh run list`
+
 ---
 
 ## Scraper
@@ -239,7 +260,7 @@ docs: atualiza CLAUDE.md com instruções do scraper
 
 ### Fase 1 — Dados ✅ (base)
 - [ ] Setup Next.js 16 + TypeScript + Tailwind + Prisma
-- [ ] Configurar Vercel Postgres
+- [ ] Configurar Supabase Postgres
 - [ ] Rodar scraper manualmente para popular o banco
 - [ ] Migrations iniciais
 
