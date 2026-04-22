@@ -222,6 +222,12 @@ docs: atualiza CLAUDE.md com instruções do scraper
 - Descrever o que foi feito e como testar
 - Vercel cria preview deploy automático por PR
 
+### Issues
+- Issues criadas por agentes de IA devem ser atribuídas a `@gianimpronta` no momento da criação
+- Ao desmembrar uma issue em sub-issues, manter a atribuição em `@gianimpronta` por padrão
+- Não é necessário workflow de auto-assign enquanto esse fluxo continuar estável
+- Se o projeto passar a ter múltiplos responsáveis abrindo issues com frequência, reavaliar essa convenção
+
 ---
 
 ## Fases do MVP
