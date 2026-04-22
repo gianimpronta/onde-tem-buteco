@@ -208,6 +208,12 @@ DATABASE_URL=<url> python main.py
 2. Verificar se existe issue ou task relacionada
 3. Criar branch a partir de `main` com nome descritivo: `feat/mapa-leaflet`, `fix/filtro-bairro`
 
+### Issues
+- Toda issue nova deve receber `labels`, `milestone` e `project`
+- Toda issue deve representar uma unidade de trabalho rastreável antes da abertura do PR
+- No project `Onde Tem Buteco`, manter apenas issues como itens visíveis
+- Pull requests não devem permanecer como itens do project; a ligação deve aparecer pela coluna `Linked pull requests` da issue
+
 ### Commits
 Seguir Conventional Commits:
 ```
@@ -220,6 +226,9 @@ docs: atualiza CLAUDE.md com instruções do scraper
 ### Pull Requests
 - PRs pequenos e focados — uma funcionalidade por PR
 - Descrever o que foi feito e como testar
+- Todo PR deve estar vinculado à issue correspondente no corpo da descrição, preferencialmente com `Closes #numero` ou `Fixes #numero` quando o merge resolver a issue
+- Todo PR deve receber as labels, milestone e project adequados ao escopo da entrega
+- PRs complementares devem usar `Refs #numero` quando fizerem parte da mesma entrega sem encerrar a issue principal
 - Vercel cria preview deploy automático por PR
 
 ---
