@@ -37,6 +37,7 @@ export type PublicButecoDetail = {
 type PublicButecoRecord = PublicButecoDetail & {
   lat: number | null;
   lng: number | null;
+  updatedAt?: Date;
 };
 
 const e2eFixtureButecos: PublicButecoRecord[] = [
@@ -276,5 +277,22 @@ export async function getButecoBySlug(slug: string): Promise<PublicButecoDetail 
   const { prisma } = await import("@/lib/prisma");
   return prisma.buteco.findUnique({
     where: { slug },
+  });
+}
+
+export async function listPublicButecoEntriesForSitemap(): Promise<
+  Array<{ slug: string; updatedAt?: Date }>
+> {
+  if (isE2EFixtureMode()) {
+    return e2eFixtureButecos.map(({ slug, updatedAt }) => ({ slug, updatedAt }));
+  }
+
+  const { prisma } = await import("@/lib/prisma");
+  return prisma.buteco.findMany({
+    orderBy: { slug: "asc" },
+    select: {
+      slug: true,
+      updatedAt: true,
+    },
   });
 }

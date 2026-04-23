@@ -1,9 +1,54 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ButecoActionPanel from "@/components/butecos/buteco-action-panel";
 import { getButecoActionState } from "@/lib/detail-actions";
 import { getButecoBySlug } from "@/lib/public-butecos";
+
+export async function generateMetadata({
+  params,
+}: Readonly<{ params: Promise<{ slug: string }> }>): Promise<Metadata> {
+  const { slug } = await params;
+  const buteco = await getButecoBySlug(slug);
+
+  if (!buteco) {
+    return {
+      title: "Buteco não encontrado",
+      description: "O buteco procurado não foi encontrado.",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const description = buteco.petiscoNome
+    ? `${buteco.petiscoNome} no ${buteco.nome}, em ${buteco.bairro ? `${buteco.bairro}, ` : ""}${buteco.cidade}.`
+    : `${buteco.nome} em ${buteco.bairro ? `${buteco.bairro}, ` : ""}${buteco.cidade}.`;
+  const url = `/butecos/${buteco.slug}`;
+
+  return {
+    title: buteco.nome,
+    description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title: buteco.nome,
+      description,
+      url,
+      type: "article",
+      images: buteco.fotoUrl ? [{ url: buteco.fotoUrl, alt: buteco.nome }] : undefined,
+    },
+    twitter: {
+      title: buteco.nome,
+      description,
+      card: buteco.fotoUrl ? "summary_large_image" : "summary",
+      images: buteco.fotoUrl ? [buteco.fotoUrl] : undefined,
+    },
+  };
+}
 
 export default async function ButecoPage({
   params,

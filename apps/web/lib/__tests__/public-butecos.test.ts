@@ -13,6 +13,7 @@ import {
   getButecosPageData,
   getHomeData,
   isE2EFixtureMode,
+  listPublicButecoEntriesForSitemap,
 } from "@/lib/public-butecos";
 
 const { prisma } = jest.requireMock("@/lib/prisma") as {
@@ -104,6 +105,23 @@ describe("public-butecos fixtures", () => {
 
     await expect(getButecoBySlug("inexistente")).resolves.toBeNull();
   });
+
+  it("lists sitemap entries from fixtures", async () => {
+    await expect(listPublicButecoEntriesForSitemap()).resolves.toEqual([
+      {
+        slug: "bar-do-zeca",
+        updatedAt: undefined,
+      },
+      {
+        slug: "cantin-do-joao",
+        updatedAt: undefined,
+      },
+      {
+        slug: "esquina-da-celia",
+        updatedAt: undefined,
+      },
+    ]);
+  });
 });
 
 describe("public-butecos prisma mode", () => {
@@ -193,5 +211,19 @@ describe("public-butecos prisma mode", () => {
       petiscoDesc: "Bolinho crocante de carne com molho da casa.",
       fotoUrl: null,
     });
+  });
+
+  it("lists sitemap entries from prisma when fixture mode is disabled", async () => {
+    const updatedAt = new Date("2026-04-23T12:00:00.000Z");
+
+    prisma.buteco.findMany.mockResolvedValue([
+      { slug: "bar-do-zeca", updatedAt },
+      { slug: "cantin-do-joao", updatedAt },
+    ]);
+
+    await expect(listPublicButecoEntriesForSitemap()).resolves.toEqual([
+      { slug: "bar-do-zeca", updatedAt },
+      { slug: "cantin-do-joao", updatedAt },
+    ]);
   });
 });
