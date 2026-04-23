@@ -38,14 +38,12 @@ function resolveFallbackDecision(geolocationSupported: boolean): GeolocationDeci
 }
 
 async function resolveStartupDecision(geolocationSupported: boolean): Promise<GeolocationDecision> {
-  const permissionsApi = navigator.permissions?.query;
-
-  if (!permissionsApi) {
+  if (!navigator.permissions?.query) {
     return resolveFallbackDecision(geolocationSupported);
   }
 
   try {
-    const permission = await permissionsApi({ name: "geolocation" });
+    const permission = await navigator.permissions.query({ name: "geolocation" });
 
     return resolveGeolocationStartup({
       geolocationSupported,
