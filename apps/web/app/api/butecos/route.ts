@@ -55,11 +55,23 @@ function toCookieValue(values: string[]): string {
 async function parseActionRequest(request: Request): Promise<{
   butecoId: string;
   action: string;
-}> {
-  return (await request.json()) as {
-    butecoId: string;
-    action: string;
-  };
+} | null> {
+  try {
+    const body = await request.json();
+
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return null;
+    }
+
+    const { butecoId, action } = body as Record<string, unknown>;
+
+    return {
+      butecoId: typeof butecoId === "string" ? butecoId : "",
+      action: typeof action === "string" ? action : "",
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function POST(request: Request) {
@@ -70,7 +82,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    const { butecoId, action } = await parseActionRequest(request);
+    const body = await parseActionRequest(request);
+
+    if (!body) {
+      return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
+    }
+
+    const { butecoId, action } = body;
 
     if (!isValidAction(action)) {
       return NextResponse.json({ error: "Ação inválida" }, { status: 400 });
@@ -111,7 +129,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
-  const { butecoId, action } = await parseActionRequest(request);
+  const body = await parseActionRequest(request);
+
+  if (!body) {
+    return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
+  }
+
+  const { butecoId, action } = body;
 
   if (!isValidAction(action)) {
     return NextResponse.json({ error: "Ação inválida" }, { status: 400 });
@@ -123,6 +147,7 @@ export async function POST(request: Request) {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
+    select: { id: true },
   });
 
   if (!user) {
