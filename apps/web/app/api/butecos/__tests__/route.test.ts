@@ -47,6 +47,21 @@ describe("POST /api/butecos", () => {
     await expect(response.json()).resolves.toEqual({ error: "Não autorizado" });
   });
 
+  it("returns 400 when the request body is not valid JSON", async () => {
+    auth.mockResolvedValue({ user: { email: "test@example.com" } });
+
+    const response = await POST(
+      new Request("https://localhost/api/butecos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "not json",
+      })
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({ error: "Requisição inválida" });
+  });
+
   it("returns 400 for invalid action", async () => {
     auth.mockResolvedValue({ user: { email: "test@example.com" } });
 
