@@ -185,6 +185,7 @@ describe("public-butecos prisma mode", () => {
 
   it("returns detail data from prisma when fixture mode is disabled", async () => {
     prisma.buteco.findUnique.mockResolvedValue({
+      id: "db-bar-do-zeca",
       slug: "bar-do-zeca",
       nome: "Bar do Zeca",
       cidade: "Belo Horizonte",
@@ -198,6 +199,7 @@ describe("public-butecos prisma mode", () => {
     });
 
     await expect(getButecoBySlug("bar-do-zeca")).resolves.toEqual({
+      id: "db-bar-do-zeca",
       slug: "bar-do-zeca",
       nome: "Bar do Zeca",
       cidade: "Belo Horizonte",

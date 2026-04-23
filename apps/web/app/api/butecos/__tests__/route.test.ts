@@ -22,8 +22,20 @@ const { prisma } = jest.requireMock("@/lib/prisma") as {
 };
 
 describe("POST /api/butecos", () => {
+  const originalFixtureMode = process.env.E2E_USE_FIXTURES;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    delete process.env.E2E_USE_FIXTURES;
+  });
+
+  afterEach(() => {
+    if (originalFixtureMode === undefined) {
+      delete process.env.E2E_USE_FIXTURES;
+      return;
+    }
+
+    process.env.E2E_USE_FIXTURES = originalFixtureMode;
   });
 
   it("returns 401 when unauthenticated", async () => {
@@ -33,6 +45,21 @@ describe("POST /api/butecos", () => {
 
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({ error: "Não autorizado" });
+  });
+
+  it("returns 400 when the request body is not valid JSON", async () => {
+    auth.mockResolvedValue({ user: { email: "test@example.com" } });
+
+    const response = await POST(
+      new Request("https://localhost/api/butecos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "not json",
+      })
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({ error: "Requisição inválida" });
   });
 
   it("returns 400 for invalid action", async () => {
@@ -47,6 +74,20 @@ describe("POST /api/butecos", () => {
 
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toEqual({ error: "Ação inválida" });
+  });
+
+  it("returns 400 when butecoId is missing", async () => {
+    auth.mockResolvedValue({ user: { email: "test@example.com" } });
+
+    const response = await POST(
+      new Request("https://localhost/api/butecos", {
+        method: "POST",
+        body: JSON.stringify({ butecoId: "", action: "favoritar" }),
+      })
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({ error: "Buteco inválido" });
   });
 
   it("returns 404 when user is not found", async () => {
@@ -115,5 +156,30 @@ describe("POST /api/butecos", () => {
       update: {},
       create: { userId: "user-1", butecoId: "buteco-1" },
     });
+  });
+
+  it("uses fixture auth cookies when e2e fixture mode is enabled", async () => {
+    process.env.E2E_USE_FIXTURES = "true";
+
+    const response = await POST(
+      new Request("https://localhost/api/butecos", {
+        method: "POST",
+        headers: {
+          cookie:
+            "onde-tem-buteco-e2e-auth=authenticated; onde-tem-buteco-e2e-favoritos=%5B%5D; onde-tem-buteco-e2e-visitas=%5B%5D",
+        },
+        body: JSON.stringify({ butecoId: "fixture-bar-do-zeca", action: "favoritar" }),
+      })
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      ok: true,
+      isFavorito: true,
+      isVisitado: false,
+    });
+    expect(response.headers.get("set-cookie")).toContain("onde-tem-buteco-e2e-favoritos=");
+    expect(auth).not.toHaveBeenCalled();
+    expect(prisma.favorito.upsert).not.toHaveBeenCalled();
   });
 });

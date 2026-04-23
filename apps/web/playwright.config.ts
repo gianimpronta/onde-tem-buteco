@@ -16,6 +16,7 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     env: {
+      DATABASE_URL: "postgresql://fixture:fixture@127.0.0.1:5432/fixture?sslmode=disable",
       E2E_USE_FIXTURES: "true",
       GOOGLE_CLIENT_ID: "e2e-google-client-id",
       GOOGLE_CLIENT_SECRET: "e2e-google-client-secret",
