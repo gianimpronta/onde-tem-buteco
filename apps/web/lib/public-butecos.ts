@@ -21,6 +21,7 @@ export type PublicButecoMapItem = {
 };
 
 export type PublicButecoDetail = {
+  id: string;
   slug: string;
   nome: string;
   cidade: string;
@@ -40,6 +41,7 @@ type PublicButecoRecord = PublicButecoDetail & {
 
 const e2eFixtureButecos: PublicButecoRecord[] = [
   {
+    id: "fixture-bar-do-zeca",
     slug: "bar-do-zeca",
     nome: "Bar do Zeca",
     cidade: "Belo Horizonte",
@@ -54,6 +56,7 @@ const e2eFixtureButecos: PublicButecoRecord[] = [
     lng: -43.9342,
   },
   {
+    id: "fixture-cantin-do-joao",
     slug: "cantin-do-joao",
     nome: "Cantin do João",
     cidade: "Belo Horizonte",
@@ -68,6 +71,7 @@ const e2eFixtureButecos: PublicButecoRecord[] = [
     lng: -43.9386,
   },
   {
+    id: "fixture-esquina-da-celia",
     slug: "esquina-da-celia",
     nome: "Esquina da Célia",
     cidade: "Contagem",
@@ -255,6 +259,7 @@ export async function getButecoBySlug(slug: string): Promise<PublicButecoDetail 
     }
 
     return {
+      id: buteco.id,
       slug: buteco.slug,
       nome: buteco.nome,
       cidade: buteco.cidade,
