@@ -8,8 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
-    "test:e2e": "playwright test",
-    "format:check": "prettier --check \"app/**/*.{ts,tsx}\" \"lib/**/*.{ts,tsx}\""
+    "test:e2e": "prisma generate && playwright test",
+    "format:check": "prettier --check \"app/**/*.{ts,tsx}\" \"lib/**/*.{ts,tsx}\"",
+    "test:e2e:setup": "prisma generate && playwright install --with-deps chromium"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.7.0",
