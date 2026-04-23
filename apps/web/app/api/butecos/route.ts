@@ -5,6 +5,11 @@ import { E2E_AUTH_COOKIE, E2E_FAVORITOS_COOKIE, E2E_VISITAS_COOKIE } from "@/lib
 import { prisma } from "@/lib/prisma";
 import { isE2EFixtureMode } from "@/lib/public-butecos";
 
+type ActionRequestBody = {
+  butecoId: string;
+  action: string;
+};
+
 function parseCookieHeader(cookieHeader: string | null): Map<string, string> {
   const cookies = new Map<string, string>();
 
@@ -52,10 +57,11 @@ function toCookieValue(values: string[]): string {
   return encodeURIComponent(JSON.stringify(values));
 }
 
-async function parseActionRequest(request: Request): Promise<{
-  butecoId: string;
-  action: string;
-} | null> {
+function buildErrorResponse(message: string, status: number) {
+  return NextResponse.json({ error: message }, { status });
+}
+
+async function parseActionRequest(request: Request): Promise<ActionRequestBody | null> {
   try {
     const body = await request.json();
 
@@ -74,108 +80,153 @@ async function parseActionRequest(request: Request): Promise<{
   }
 }
 
-export async function POST(request: Request) {
-  if (isE2EFixtureMode()) {
-    const requestCookies = parseCookieHeader(request.headers.get("cookie"));
-
-    if (requestCookies.get(E2E_AUTH_COOKIE) !== "authenticated") {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-    }
-
-    const body = await parseActionRequest(request);
-
-    if (!body) {
-      return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
-    }
-
-    const { butecoId, action } = body;
-
-    if (!isValidAction(action)) {
-      return NextResponse.json({ error: "Ação inválida" }, { status: 400 });
-    }
-
-    if (!butecoId.trim()) {
-      return NextResponse.json({ error: "Buteco inválido" }, { status: 400 });
-    }
-
-    const favoritos = parseCookieList(requestCookies.get(E2E_FAVORITOS_COOKIE));
-    const visitas = parseCookieList(requestCookies.get(E2E_VISITAS_COOKIE));
-
-    const nextFavoritos = new Set(favoritos);
-    const nextVisitas = new Set(visitas);
-
-    if (action === "favoritar") {
-      nextFavoritos.add(butecoId);
-    } else if (action === "desfavoritar") {
-      nextFavoritos.delete(butecoId);
-    } else if (action === "visitar") {
-      nextVisitas.add(butecoId);
-    }
-
-    const response = NextResponse.json({
-      ok: true,
-      isFavorito: nextFavoritos.has(butecoId),
-      isVisitado: nextVisitas.has(butecoId),
-    });
-
-    response.cookies.set(E2E_FAVORITOS_COOKIE, toCookieValue([...nextFavoritos]), { path: "/" });
-    response.cookies.set(E2E_VISITAS_COOKIE, toCookieValue([...nextVisitas]), { path: "/" });
-
-    return response;
-  }
-
-  const session = await auth();
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
-
-  const body = await parseActionRequest(request);
-
+function validateActionRequest(body: ActionRequestBody | null): ActionRequestBody | NextResponse {
   if (!body) {
-    return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
+    return buildErrorResponse("Requisição inválida", 400);
   }
 
-  const { butecoId, action } = body;
-
-  if (!isValidAction(action)) {
-    return NextResponse.json({ error: "Ação inválida" }, { status: 400 });
+  if (!isValidAction(body.action)) {
+    return buildErrorResponse("Ação inválida", 400);
   }
 
-  if (!butecoId.trim()) {
-    return NextResponse.json({ error: "Buteco inválido" }, { status: 400 });
+  if (!body.butecoId.trim()) {
+    return buildErrorResponse("Buteco inválido", 400);
   }
 
+  return body;
+}
+
+function applyFixtureAction(
+  action: string,
+  butecoId: string,
+  favoritos: string[],
+  visitas: string[]
+) {
+  const nextFavoritos = new Set(favoritos);
+  const nextVisitas = new Set(visitas);
+
+  if (action === "favoritar") {
+    nextFavoritos.add(butecoId);
+  } else if (action === "desfavoritar") {
+    nextFavoritos.delete(butecoId);
+  } else if (action === "visitar") {
+    nextVisitas.add(butecoId);
+  }
+
+  return {
+    isFavorito: nextFavoritos.has(butecoId),
+    isVisitado: nextVisitas.has(butecoId),
+    favoritos: [...nextFavoritos],
+    visitas: [...nextVisitas],
+  };
+}
+
+function buildFixtureResponse(result: {
+  isFavorito: boolean;
+  isVisitado: boolean;
+  favoritos: string[];
+  visitas: string[];
+}) {
+  const response = NextResponse.json({
+    ok: true,
+    isFavorito: result.isFavorito,
+    isVisitado: result.isVisitado,
+  });
+
+  response.cookies.set(E2E_FAVORITOS_COOKIE, toCookieValue(result.favoritos), { path: "/" });
+  response.cookies.set(E2E_VISITAS_COOKIE, toCookieValue(result.visitas), { path: "/" });
+
+  return response;
+}
+
+async function handleFixtureRequest(request: Request, body: ActionRequestBody) {
+  const requestCookies = parseCookieHeader(request.headers.get("cookie"));
+
+  if (requestCookies.get(E2E_AUTH_COOKIE) !== "authenticated") {
+    return buildErrorResponse("Não autorizado", 401);
+  }
+
+  const favoritos = parseCookieList(requestCookies.get(E2E_FAVORITOS_COOKIE));
+  const visitas = parseCookieList(requestCookies.get(E2E_VISITAS_COOKIE));
+
+  return buildFixtureResponse(applyFixtureAction(body.action, body.butecoId, favoritos, visitas));
+}
+
+async function loadUserId(userEmail: string) {
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { email: userEmail },
     select: { id: true },
   });
 
   if (!user) {
-    return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
+    return null;
   }
 
-  let isFavorito = false;
-  let isVisitado = false;
+  return user.id;
+}
 
-  if (action === "favoritar") {
+async function persistAction(userId: string, body: ActionRequestBody) {
+  if (body.action === "favoritar") {
     await prisma.favorito.upsert({
-      where: { userId_butecoId: { userId: user.id, butecoId } },
+      where: { userId_butecoId: { userId, butecoId: body.butecoId } },
       update: {},
-      create: { userId: user.id, butecoId },
+      create: { userId, butecoId: body.butecoId },
     });
-    isFavorito = true;
-  } else if (action === "desfavoritar") {
-    await prisma.favorito.deleteMany({
-      where: { userId: user.id, butecoId },
-    });
-  } else if (action === "visitar") {
-    await prisma.visita.upsert({
-      where: { userId_butecoId: { userId: user.id, butecoId } },
-      update: {},
-      create: { userId: user.id, butecoId },
-    });
-    isVisitado = true;
+
+    return { isFavorito: true, isVisitado: false };
   }
 
-  return NextResponse.json({ ok: true, isFavorito, isVisitado });
+  if (body.action === "desfavoritar") {
+    await prisma.favorito.deleteMany({
+      where: { userId, butecoId: body.butecoId },
+    });
+
+    return { isFavorito: false, isVisitado: false };
+  }
+
+  await prisma.visita.upsert({
+    where: { userId_butecoId: { userId, butecoId: body.butecoId } },
+    update: {},
+    create: { userId, butecoId: body.butecoId },
+  });
+
+  return { isFavorito: false, isVisitado: true };
+}
+
+async function handlePersistedRequest(body: ActionRequestBody, userEmail: string) {
+  const userId = await loadUserId(userEmail);
+
+  if (!userId) {
+    return buildErrorResponse("Usuário não encontrado", 404);
+  }
+
+  const result = await persistAction(userId, body);
+
+  return NextResponse.json({ ok: true, ...result });
+}
+
+export async function POST(request: Request) {
+  if (isE2EFixtureMode()) {
+    const parsedBody = validateActionRequest(await parseActionRequest(request));
+
+    if (parsedBody instanceof NextResponse) {
+      return parsedBody;
+    }
+
+    return handleFixtureRequest(request, parsedBody);
+  }
+
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    return buildErrorResponse("Não autorizado", 401);
+  }
+
+  const parsedBody = validateActionRequest(await parseActionRequest(request));
+
+  if (parsedBody instanceof NextResponse) {
+    return parsedBody;
+  }
+
+  return handlePersistedRequest(parsedBody, session.user.email);
 }

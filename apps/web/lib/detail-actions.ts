@@ -52,7 +52,9 @@ function parseCookieList(value: string | undefined): string[] {
 }
 
 export function buildButecoLoginHref(slug: string): string {
-  return `/login?callbackUrl=${encodeURIComponent(`/butecos/${slug}`)}`;
+  const callbackUrl = `/butecos/${slug}`;
+
+  return `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`;
 }
 
 export async function getButecoActionState({
