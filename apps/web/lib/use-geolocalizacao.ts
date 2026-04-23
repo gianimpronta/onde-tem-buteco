@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { resolveGeolocationStartup } from "@/lib/geolocalizacao";
 
 type Coordenadas = { lat: number; lng: number };
 
@@ -48,6 +49,54 @@ export function useGeolocalizacao(): GeolocalizacaoState {
       { timeout: 10000, maximumAge: 60000 }
     );
   }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    async function startup() {
+      const geolocationSupported = typeof navigator !== "undefined" && "geolocation" in navigator;
+      const permissionsApi = navigator.permissions?.query;
+
+      if (!permissionsApi) {
+        const fallback = resolveGeolocationStartup({
+          geolocationSupported,
+          permissionState: geolocationSupported ? "prompt" : null,
+        });
+
+        if (!active) return;
+        if (fallback.errorMessage) setErro(fallback.errorMessage);
+        if (fallback.shouldRequestLocation) buscar();
+        return;
+      }
+
+      try {
+        const permission = await permissionsApi({ name: "geolocation" });
+        if (!active) return;
+
+        const decision = resolveGeolocationStartup({
+          geolocationSupported,
+          permissionState: permission.state,
+        });
+
+        if (decision.errorMessage) setErro(decision.errorMessage);
+        if (decision.shouldRequestLocation) buscar();
+      } catch {
+        if (!active) return;
+        const fallback = resolveGeolocationStartup({
+          geolocationSupported,
+          permissionState: geolocationSupported ? "prompt" : null,
+        });
+        if (fallback.errorMessage) setErro(fallback.errorMessage);
+        if (fallback.shouldRequestLocation) buscar();
+      }
+    }
+
+    void startup();
+
+    return () => {
+      active = false;
+    };
+  }, [buscar]);
 
   return { coords, carregando, erro, buscar };
 }
