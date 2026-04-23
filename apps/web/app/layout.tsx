@@ -15,8 +15,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Onde Tem Buteco",
-  description: "Encontre e explore os butecos participantes em um mapa interativo.",
+  metadataBase: new URL(process.env.NEXTAUTH_URL ?? "https://onde-tem-buteco.vercel.app"),
+  title: {
+    default: "Onde Tem Buteco",
+    template: "%s | Onde Tem Buteco",
+  },
+  description:
+    "Encontre os butecos participantes do Comida di Buteco em um mapa interativo, com filtros por cidade e bairro.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Onde Tem Buteco",
+    description:
+      "Encontre os butecos participantes do Comida di Buteco em um mapa interativo, com filtros por cidade e bairro.",
+    url: "/",
+    siteName: "Onde Tem Buteco",
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Onde Tem Buteco",
+    description:
+      "Encontre os butecos participantes do Comida di Buteco em um mapa interativo, com filtros por cidade e bairro.",
+  },
 };
 
 const themeScript = `
