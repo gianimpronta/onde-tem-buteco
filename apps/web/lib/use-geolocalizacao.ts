@@ -88,7 +88,7 @@ export function useGeolocalizacao(): GeolocalizacaoState {
     let active = true;
 
     async function startup() {
-      const geolocationSupported = typeof navigator !== "undefined" && "geolocation" in navigator;
+      const geolocationSupported = "geolocation" in navigator;
       const decision = await resolveStartupDecision(geolocationSupported);
 
       if (!active) return;
