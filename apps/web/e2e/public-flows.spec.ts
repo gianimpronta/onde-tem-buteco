@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("carrega a home pública com os elementos principais", async ({ page }) => {
+test("carrega a home publica com os elementos principais", async ({ page }) => {
   await page.goto("/");
 
   await expect(
@@ -60,7 +60,7 @@ test("busca por nome do buteco ou petisco", async ({ page }) => {
   await expect(page.getByRole("link", { name: /Bar do Zeca/i })).toHaveCount(0);
 });
 
-test("exibe estado vazio quando não há resultados", async ({ page }) => {
+test("exibe estado vazio quando nao ha resultados", async ({ page }) => {
   await page.goto("/butecos");
 
   await page.locator('input[name="q"]').fill("Inexistente");
@@ -72,7 +72,7 @@ test("exibe estado vazio quando não há resultados", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Voltar para a home" })).toBeVisible();
 });
 
-test("navega da listagem para a página de detalhe", async ({ page }) => {
+test("navega da listagem para a pagina de detalhe", async ({ page }) => {
   await page.goto("/butecos");
 
   await page.getByRole("link", { name: /Bar do Zeca/i }).click();
@@ -81,7 +81,7 @@ test("navega da listagem para a página de detalhe", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Bar do Zeca" })).toBeVisible();
 });
 
-test("renderiza os dados principais da página de detalhe", async ({ page }) => {
+test("renderiza os dados principais da pagina de detalhe", async ({ page }) => {
   await page.goto("/butecos/bar-do-zeca");
 
   await expect(page.getByRole("heading", { name: "Bar do Zeca" })).toBeVisible();
@@ -89,4 +89,34 @@ test("renderiza os dados principais da página de detalhe", async ({ page }) => 
   await expect(page.getByRole("heading", { name: "Bolinho da Casa" })).toBeVisible();
   await expect(page.getByText("Rua dos Testes, 123 - Savassi, Belo Horizonte - MG")).toBeVisible();
   await expect(page.getByText("(31) 3333-1111")).toBeVisible();
+});
+
+test("aplica o tema escuro inicial a partir da preferencia salva", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("theme", "dark");
+  });
+
+  await page.goto("/");
+
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect(page.getByRole("button", { name: "Mudar para tema claro" })).toBeVisible();
+});
+
+test("exibe feedback claro quando a localizacao esta indisponivel no primeiro acesso", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: undefined,
+    });
+    Object.defineProperty(navigator, "permissions", {
+      configurable: true,
+      value: undefined,
+    });
+  });
+
+  await page.goto("/");
+
+  await expect(page.getByText("Geolocalização não é suportada pelo seu navegador.")).toBeVisible();
 });
