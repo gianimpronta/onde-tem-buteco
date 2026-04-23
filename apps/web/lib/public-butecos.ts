@@ -108,20 +108,16 @@ function filterFixtureButecos(filters: ButecoSearchFilters): PublicButecoRecord[
       return true;
     }
 
-    return where.OR.some((condition) => {
-      const containsValue =
-        "nome" in condition ? condition.nome?.contains : condition.petiscoNome?.contains;
+    const query = normalizedFilters.q?.toLocaleLowerCase("pt-BR");
 
-      if (!containsValue) {
-        return false;
-      }
+    if (!query) {
+      return true;
+    }
 
-      const query = containsValue.toLocaleLowerCase("pt-BR");
-      return (
-        buteco.nome.toLocaleLowerCase("pt-BR").includes(query) ||
-        buteco.petiscoNome?.toLocaleLowerCase("pt-BR").includes(query) === true
-      );
-    });
+    return (
+      buteco.nome.toLocaleLowerCase("pt-BR").includes(query) ||
+      buteco.petiscoNome?.toLocaleLowerCase("pt-BR").includes(query) === true
+    );
   });
 }
 
