@@ -58,6 +58,12 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
           {erro}
         </div>
       )}
+      {coords && !erro && (
+        <div className="flex items-center gap-2 border-b border-emerald-100 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-700 dark:border-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-300">
+          <span aria-hidden="true">📍</span>
+          Usando sua localização para destacar o mapa.
+        </div>
+      )}
       <div className="relative">
         <button
           onClick={buscar}
@@ -66,7 +72,7 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
           className="absolute right-3 top-3 z-[1000] flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-md transition hover:bg-zinc-50 disabled:cursor-wait disabled:opacity-70 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
         >
           <span aria-hidden="true">{carregando ? "⏳" : "📍"}</span>
-          {carregando ? "Localizando…" : "Usar minha localização"}
+          {carregando ? "Localizando..." : "Usar minha localização"}
         </button>
         <MapContainer
           center={defaultCenter}
