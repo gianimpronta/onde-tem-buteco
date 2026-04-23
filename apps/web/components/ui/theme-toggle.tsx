@@ -1,18 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+import { resolveInitialTheme, type ThemePreference } from "@/lib/theme";
+
+function subscribeToThemeChanges(callback: () => void) {
+  window.addEventListener("storage", callback);
+  window.addEventListener("theme-changed", callback);
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("theme-changed", callback);
+  };
+}
+
+function getThemeSnapshot(): ThemePreference {
+  return resolveInitialTheme({
+    storedTheme: (localStorage.getItem("theme") as ThemePreference | null) ?? null,
+    systemPrefersDark: window.matchMedia("(prefers-color-scheme: dark)").matches,
+  });
+}
+
+function getServerThemeSnapshot(): ThemePreference {
+  return "light";
+}
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false);
+  const theme = useSyncExternalStore(
+    subscribeToThemeChanges,
+    getThemeSnapshot,
+    getServerThemeSnapshot
+  );
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
 
   function toggle() {
-    const currentThemeIsDark = document.documentElement.classList.contains("dark");
-    const next = !currentThemeIsDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
+    const nextTheme: ThemePreference = theme === "dark" ? "light" : "dark";
+    document.documentElement.classList.toggle("dark", nextTheme === "dark");
 
     try {
-      localStorage.setItem("theme", next ? "dark" : "light");
+      localStorage.setItem("theme", nextTheme);
+      window.dispatchEvent(new CustomEvent("theme-changed"));
     } catch {}
   }
 
@@ -20,10 +48,10 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label={isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
+      aria-label={theme === "dark" ? "Mudar para tema claro" : "Mudar para tema escuro"}
       className="rounded-full border border-zinc-200 p-2 text-zinc-600 transition hover:border-amber-300 hover:bg-amber-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-amber-600 dark:hover:bg-amber-900/20"
     >
-      {isDark ? (
+      {theme === "dark" ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
