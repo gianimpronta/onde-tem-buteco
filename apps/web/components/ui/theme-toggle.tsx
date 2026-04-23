@@ -5,7 +5,11 @@ import { resolveInitialTheme, type ThemePreference } from "@/lib/theme";
 
 function subscribeToThemeChanges(callback: () => void) {
   window.addEventListener("storage", callback);
-  return () => window.removeEventListener("storage", callback);
+  window.addEventListener("theme-changed", callback);
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("theme-changed", callback);
+  };
 }
 
 function getThemeSnapshot(): ThemePreference {
@@ -36,7 +40,7 @@ export function ThemeToggle() {
 
     try {
       localStorage.setItem("theme", nextTheme);
-      window.dispatchEvent(new StorageEvent("storage", { key: "theme", newValue: nextTheme }));
+      window.dispatchEvent(new CustomEvent("theme-changed"));
     } catch {}
   }
 
