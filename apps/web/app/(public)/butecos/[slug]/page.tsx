@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ButecoActionPanel from "@/components/butecos/buteco-action-panel";
+import { getButecoActionState } from "@/lib/detail-actions";
 import { getButecoBySlug } from "@/lib/public-butecos";
 
 export async function generateMetadata({
@@ -55,7 +57,15 @@ export default async function ButecoPage({
 
   const buteco = await getButecoBySlug(slug);
 
-  if (!buteco) notFound();
+  if (!buteco) {
+    notFound();
+    return null;
+  }
+
+  const actionState = await getButecoActionState({
+    butecoId: buteco.id,
+    slug: buteco.slug,
+  });
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
@@ -92,6 +102,13 @@ export default async function ButecoPage({
         {buteco.telefone && <p>{buteco.telefone}</p>}
         {buteco.horario && <p>{buteco.horario}</p>}
       </div>
+      <ButecoActionPanel
+        butecoId={buteco.id}
+        loginHref={actionState.loginHref}
+        isAuthenticated={actionState.isAuthenticated}
+        initialIsFavorito={actionState.isFavorito}
+        initialIsVisitado={actionState.isVisitado}
+      />
     </main>
   );
 }

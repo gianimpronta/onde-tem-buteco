@@ -1,5 +1,25 @@
 import { expect, test } from "@playwright/test";
 
+async function signInWithFixtureCookies(page: import("@playwright/test").Page) {
+  await page.context().addCookies([
+    {
+      name: "onde-tem-buteco-e2e-auth",
+      value: "authenticated",
+      url: "http://127.0.0.1:3000",
+    },
+    {
+      name: "onde-tem-buteco-e2e-favoritos",
+      value: "[]",
+      url: "http://127.0.0.1:3000",
+    },
+    {
+      name: "onde-tem-buteco-e2e-visitas",
+      value: "[]",
+      url: "http://127.0.0.1:3000",
+    },
+  ]);
+}
+
 test("carrega a home publica com os elementos principais", async ({ page }) => {
   await page.goto("/");
 
@@ -89,6 +109,43 @@ test("renderiza os dados principais da pagina de detalhe", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Bolinho da Casa" })).toBeVisible();
   await expect(page.getByText("Rua dos Testes, 123 - Savassi, Belo Horizonte - MG")).toBeVisible();
   await expect(page.getByText("(31) 3333-1111")).toBeVisible();
+});
+
+test("exibe CTA de login na pagina de detalhe para usuario anonimo", async ({ page }) => {
+  await page.goto("/butecos/bar-do-zeca");
+
+  await expect(
+    page.getByRole("link", { name: "Faça login para favoritar e registrar visita" })
+  ).toHaveAttribute("href", "/login?callbackUrl=%2Fbutecos%2Fbar-do-zeca");
+  await expect(page.getByRole("button", { name: "Favoritar" })).toHaveCount(0);
+});
+
+test("permite favoritar, desfavoritar e registrar visita com sessao mockada em fixture mode", async ({
+  page,
+}) => {
+  await signInWithFixtureCookies(page);
+  await page.goto("/butecos/bar-do-zeca");
+
+  await expect(page.getByRole("button", { name: "Favoritar" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Marcar como visitado" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Favoritar" }).click();
+  await expect(page.getByText("Buteco adicionado aos favoritos.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Remover dos favoritos" })).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Remover dos favoritos" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Remover dos favoritos" }).click();
+  await expect(page.getByText("Buteco removido dos favoritos.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Favoritar" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Marcar como visitado" }).click();
+  await expect(page.getByText("Visita registrada com sucesso.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Visitado" })).toBeDisabled();
+
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Visitado" })).toBeDisabled();
 });
 
 test("aplica o tema escuro inicial a partir da preferencia salva", async ({ page }) => {

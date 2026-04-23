@@ -15,6 +15,17 @@ jest.mock("@/lib/public-butecos", () => ({
   getButecoBySlug: jest.fn(),
 }));
 
+jest.mock("@/lib/detail-actions", () => ({
+  getButecoActionState: jest.fn().mockResolvedValue({
+    isAuthenticated: false,
+    isFavorito: false,
+    isVisitado: false,
+    loginHref: "/login",
+  }),
+}));
+
+jest.mock("@/components/butecos/buteco-action-panel", () => () => null);
+
 describe("SEO metadata", () => {
   const originalNextAuthUrl = process.env.NEXTAUTH_URL;
 
