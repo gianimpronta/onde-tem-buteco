@@ -1,16 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { getButecoBySlug } from "@/lib/public-butecos";
 
 export default async function ButecoPage({
   params,
 }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
 
-  const buteco = await prisma.buteco.findUnique({
-    where: { slug },
-  });
+  const buteco = await getButecoBySlug(slug);
 
   if (!buteco) notFound();
 

@@ -7,15 +7,11 @@ const config: Config = {
   coverageProvider: "v8",
   testEnvironment: "node",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+  testPathIgnorePatterns: ["<rootDir>/e2e/"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
   },
-  collectCoverageFrom: [
-    "app/api/**/*.ts",
-    "lib/**/*.ts",
-    "!lib/**/__tests__/**",
-    "!**/*.d.ts",
-  ],
+  collectCoverageFrom: ["app/api/**/*.ts", "lib/**/*.ts", "!lib/**/__tests__/**", "!**/*.d.ts"],
 };
 
 export default createJestConfig(config);
