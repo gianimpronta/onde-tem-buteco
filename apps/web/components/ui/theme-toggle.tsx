@@ -2,23 +2,12 @@
 
 import { useState } from "react";
 
-function getInitialThemeState(): boolean | null {
-  if (typeof document === "undefined") {
-    return null;
-  }
-
-  return document.documentElement.classList.contains("dark");
-}
-
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState<boolean | null>(getInitialThemeState);
+  const [isDark, setIsDark] = useState(false);
 
   function toggle() {
-    if (isDark === null) {
-      return;
-    }
-
-    const next = !isDark;
+    const currentThemeIsDark = document.documentElement.classList.contains("dark");
+    const next = !currentThemeIsDark;
     setIsDark(next);
     document.documentElement.classList.toggle("dark", next);
 
@@ -26,8 +15,6 @@ export function ThemeToggle() {
       localStorage.setItem("theme", next ? "dark" : "light");
     } catch {}
   }
-
-  if (isDark === null) return null;
 
   return (
     <button

@@ -27,17 +27,17 @@ devem ser alterados manualmente no banco.
 
 ## Stack
 
-| Camada | Tecnologia |
-|---|---|
-| Framework | Next.js 16 (App Router) + TypeScript |
-| Estilização | Tailwind CSS |
-| ORM | Prisma |
-| Banco de dados | Vercel Postgres (Neon) |
-| Autenticação | NextAuth.js v5 (Google OAuth) |
-| Mapa | Leaflet.js |
-| Scraper | Python 3.12 + BeautifulSoup + psycopg2 |
-| CI/CD | GitHub Actions |
-| Hospedagem | Vercel |
+| Camada         | Tecnologia                             |
+| -------------- | -------------------------------------- |
+| Framework      | Next.js 16 (App Router) + TypeScript   |
+| Estilização    | Tailwind CSS                           |
+| ORM            | Prisma                                 |
+| Banco de dados | Supabase Postgres                      |
+| Autenticação   | NextAuth.js v5 (Google OAuth)          |
+| Mapa           | Leaflet.js                             |
+| Scraper        | Python 3.12 + BeautifulSoup + psycopg2 |
+| CI/CD          | GitHub Actions                         |
+| Hospedagem     | Vercel                                 |
 
 ---
 
@@ -155,6 +155,30 @@ GOOGLE_CLIENT_SECRET=
 
 O scraper usa apenas `DATABASE_URL`, injetada via GitHub Actions Secret.
 
+## Comandos úteis de infraestrutura
+
+### Vercel
+
+- `vercel link`
+- `vercel env pull .env.local`
+- `vercel pull`
+
+### Supabase
+
+- `supabase link --project-ref <project-ref>`
+- `supabase db pull`
+- `supabase db push`
+- `supabase secrets set --env-file .env.local`
+
+### GitHub
+
+- `gh auth status`
+- `gh issue view <numero>`
+- `gh issue create`
+- `gh pr create --draft`
+- `gh pr view --web`
+- `gh run list`
+
 ---
 
 ## Scraper
@@ -178,6 +202,7 @@ DATABASE_URL=<url> python main.py
 ## Convenções de código
 
 ### Geral
+
 - TypeScript strict mode sempre ativado — sem `any`
 - Funções e variáveis em `camelCase`
 - Componentes React em `PascalCase`
@@ -185,17 +210,20 @@ DATABASE_URL=<url> python main.py
 - Sem comentários óbvios — o código deve ser autodescritivo
 
 ### Next.js
+
 - Preferir Server Components por padrão
 - Client Components (`"use client"`) apenas quando necessário (interatividade, hooks)
 - Dados sempre buscados no servidor via Prisma — nunca expor o client do Prisma no browser
 - Rotas de API apenas para mutações (POST/DELETE de favoritos e visitas)
 
 ### Prisma
+
 - Sempre usar o singleton de `lib/prisma.ts`
 - Nunca usar `prisma.$queryRaw` — usar a API do Prisma
 - Migrations via `prisma migrate dev` em desenvolvimento
 
 ### Tailwind
+
 - Sem CSS customizado — usar apenas classes utilitárias do Tailwind
 - Componentes reutilizáveis extraídos para `components/ui/`
 
@@ -204,6 +232,7 @@ DATABASE_URL=<url> python main.py
 ## Fluxo de desenvolvimento
 
 ### Antes de começar qualquer tarefa
+
 1. Ler este arquivo
 2. Verificar se existe issue ou task relacionada
 3. Criar branch a partir de `main` com nome descritivo: `feat/mapa-leaflet`, `fix/filtro-bairro`
@@ -215,7 +244,9 @@ DATABASE_URL=<url> python main.py
 - Pull requests não devem permanecer como itens do project; a ligação deve aparecer pela coluna `Linked pull requests` da issue
 
 ### Commits
+
 Seguir Conventional Commits:
+
 ```
 feat: adiciona mapa interativo com Leaflet
 fix: corrige filtro por bairro no Rio
@@ -224,6 +255,7 @@ docs: atualiza CLAUDE.md com instruções do scraper
 ```
 
 ### Pull Requests
+
 - PRs pequenos e focados — uma funcionalidade por PR
 - Descrever o que foi feito e como testar
 - Todo PR deve estar vinculado à issue correspondente no corpo da descrição, preferencialmente com `Closes #numero` ou `Fixes #numero` quando o merge resolver a issue
@@ -231,29 +263,46 @@ docs: atualiza CLAUDE.md com instruções do scraper
 - PRs complementares devem usar `Refs #numero` quando fizerem parte da mesma entrega sem encerrar a issue principal
 - Vercel cria preview deploy automático por PR
 
+### Antes de push
+
+- Sempre rodar `format`, `lint`, `test` e `e2e` antes de qualquer `git push`
+- Não fazer push com qualquer uma dessas etapas falhando
+- Ao descrever validação em PRs, incluir de forma objetiva que essas quatro etapas foram executadas
+
+### Issues
+
+- Issues criadas por agentes de IA devem ser atribuídas a `@gianimpronta` no momento da criação
+- Ao desmembrar uma issue em sub-issues, manter a atribuição em `@gianimpronta` por padrão
+- Não é necessário workflow de auto-assign enquanto esse fluxo continuar estável
+- Se o projeto passar a ter múltiplos responsáveis abrindo issues com frequência, reavaliar essa convenção
+
 ---
 
 ## Fases do MVP
 
 ### Fase 1 — Dados ✅ (base)
+
 - [ ] Setup Next.js 16 + TypeScript + Tailwind + Prisma
-- [ ] Configurar Vercel Postgres
+- [ ] Configurar Supabase Postgres
 - [ ] Rodar scraper manualmente para popular o banco
 - [ ] Migrations iniciais
 
 ### Fase 2 — Leitura
+
 - [ ] Listagem de butecos com filtro por cidade e bairro
 - [ ] Busca por nome
 - [ ] Página de detalhe do buteco
 - [ ] Mapa interativo com Leaflet
 
 ### Fase 3 — Usuário
+
 - [ ] Google OAuth via NextAuth
 - [ ] Favoritar buteco
 - [ ] Marcar como visitado
 - [ ] Página "Minha Conta" com favoritos e histórico
 
 ### Fase 4 — Produção
+
 - [ ] SEO básico (metadata, Open Graph, sitemap.xml)
 - [ ] Deploy na Vercel
 - [ ] Configurar GitHub Actions cron do scraper
@@ -276,13 +325,13 @@ Este repositório é **público**. Qualquer pessoa pode ler o código.
 
 ## Arquivos obrigatórios no repositório
 
-| Arquivo | Propósito |
-|---|---|
-| `.gitignore` | Ignorar `.env.local`, `.env`, `node_modules/`, `.next/`, `__pycache__/` |
-| `.env.example` | Documentar todas as variáveis necessárias com valores vazios |
-| `README.md` | Descrição, como rodar localmente, stack e créditos |
-| `LICENSE` | MIT — uso livre com atribuição |
-| `CLAUDE.md` | Este arquivo — guia para agentes de IA e colaboradores |
+| Arquivo        | Propósito                                                               |
+| -------------- | ----------------------------------------------------------------------- |
+| `.gitignore`   | Ignorar `.env.local`, `.env`, `node_modules/`, `.next/`, `__pycache__/` |
+| `.env.example` | Documentar todas as variáveis necessárias com valores vazios            |
+| `README.md`    | Descrição, como rodar localmente, stack e créditos                      |
+| `LICENSE`      | MIT — uso livre com atribuição                                          |
+| `CLAUDE.md`    | Este arquivo — guia para agentes de IA e colaboradores                  |
 
 ---
 

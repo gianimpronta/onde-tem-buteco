@@ -1,52 +1,13 @@
 import { MapaButecosShell } from "@/components/mapa/mapa-butecos-shell";
-import { prisma } from "@/lib/prisma";
+import { getHomeData } from "@/lib/public-butecos";
 
 export const dynamic = "force-dynamic";
 
-type ButecoComCoordenada = {
-  slug: string;
-  nome: string;
-  bairro: string | null;
-  lat: number;
-  lng: number;
-};
-
-async function getHomeData(): Promise<{ total: number; butecosComMapa: ButecoComCoordenada[] }> {
-  try {
-    const [total, butecos] = await Promise.all([
-      prisma.buteco.count(),
-      prisma.buteco.findMany({
-        where: {
-          lat: { not: null },
-          lng: { not: null },
-        },
-        orderBy: { nome: "asc" },
-        select: {
-          slug: true,
-          nome: true,
-          bairro: true,
-          lat: true,
-          lng: true,
-        },
-      }),
-    ]);
-
-    const butecosComMapa = butecos.flatMap((buteco) => {
-      if (buteco.lat === null || buteco.lng === null) {
-        return [];
-      }
-
-      return [{ ...buteco, lat: buteco.lat, lng: buteco.lng }];
-    });
-
-    return { total, butecosComMapa };
-  } catch {
-    return { total: 0, butecosComMapa: [] };
-  }
-}
-
 export default async function Home() {
-  const { total, butecosComMapa } = await getHomeData();
+  const { total, butecosComMapa } = await getHomeData().catch(() => ({
+    total: 0,
+    butecosComMapa: [],
+  }));
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-5 sm:gap-8 sm:px-6 sm:py-8 lg:px-8">
