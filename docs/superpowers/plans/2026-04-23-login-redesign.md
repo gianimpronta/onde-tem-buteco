@@ -1,3 +1,30 @@
+# Login Redesign Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Redesenhar a rota `/login` para uma tela de card unico, quente e orientada a utilidade da conta, sem alterar o fluxo existente de autenticacao com Google.
+
+**Architecture:** A implementacao fica concentrada em `apps/web/app/(auth)/login/page.tsx`, mantendo a action server-side atual e substituindo apenas a composicao visual e a hierarquia de conteudo. O layout sera construído com Tailwind, com fundo em gradiente, contexto curto acima do card, dois beneficios compactos, CTA dominante e comportamento responsivo mobile-first.
+
+**Tech Stack:** Next.js App Router, React Server Components, TypeScript, Tailwind CSS, NextAuth sign-in server action
+
+---
+
+## File Structure
+
+- Modify: `apps/web/app/(auth)/login/page.tsx`
+  - Responsabilidade: renderizar a pagina de login com novo layout, novo conteudo e CTA principal sem alterar a logica de autenticacao.
+- Verify visually: `apps/web/app/(auth)/login/page.tsx`
+  - Responsabilidade: confirmar semantica simples, hierarquia do CTA e responsividade.
+
+### Task 1: Rewrite the Login Page Markup
+
+**Files:**
+- Modify: `apps/web/app/(auth)/login/page.tsx`
+
+- [ ] **Step 1: Replace the minimal centered layout with the approved single-card structure**
+
+```tsx
 import { signIn } from "@/lib/auth";
 
 const loginBenefits = [
@@ -43,8 +70,8 @@ export default function LoginPage() {
             </h1>
 
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-amber-50/85 sm:text-base">
-              Salve favoritos, acompanhe visitas e deixe seu proximo roteiro pronto para quando
-              bater a vontade de sair.
+              Salve favoritos, acompanhe visitas e deixe seu proximo roteiro pronto para
+              quando bater a vontade de sair.
             </p>
           </section>
 
@@ -118,3 +145,103 @@ export default function LoginPage() {
     </main>
   );
 }
+```
+
+- [ ] **Step 2: Verify the file keeps server-side auth behavior intact**
+
+Run:
+
+```powershell
+Get-Content 'apps/web/app/(auth)/login/page.tsx'
+```
+
+Expected:
+- The file still imports `signIn` from `@/lib/auth`
+- The form still uses `action={async () => { "use server"; await signIn("google"); }}`
+- No client component directive is introduced
+
+- [ ] **Step 3: Commit the markup rewrite**
+
+```bash
+git add apps/web/app/(auth)/login/page.tsx
+git commit -m "feat: redesign login page"
+```
+
+### Task 2: Validate Hierarchy and Responsiveness
+
+**Files:**
+- Verify: `apps/web/app/(auth)/login/page.tsx`
+
+- [ ] **Step 1: Check the CTA remains visually dominant in the final markup**
+
+Inspect these details in `apps/web/app/(auth)/login/page.tsx`:
+
+```tsx
+className="inline-flex h-14 w-full items-center justify-center gap-3 rounded-full ..."
+className="mx-auto mt-5 max-w-[12ch] text-4xl font-black ..."
+className="mt-6 grid gap-3 sm:grid-cols-2"
+```
+
+Expected:
+- The button is full width inside the card
+- The heading is prominent but secondary to the button's action role
+- The benefit cards stay compact and do not outgrow the CTA
+
+- [ ] **Step 2: Check the mobile-first layout constraints**
+
+Inspect these details in `apps/web/app/(auth)/login/page.tsx`:
+
+```tsx
+className="relative min-h-screen ... px-4 py-8 sm:px-6 lg:px-8"
+className="mx-auto w-full max-w-[29rem] ..."
+className="grid gap-3 sm:grid-cols-2"
+className="grid gap-3 ... lg:grid-cols-3"
+```
+
+Expected:
+- Single-column flow by default
+- Benefits only split into two columns from `sm` upward
+- Support cards remain stacked until larger screens
+- Card width stays controlled on desktop
+
+- [ ] **Step 3: Run lint for the touched file's project**
+
+Run:
+
+```powershell
+npm run lint --workspace apps/web
+```
+
+Expected:
+- Exit code `0`
+- No lint errors for `app/(auth)/login/page.tsx`
+
+- [ ] **Step 4: Start the web app and visually verify `/login`**
+
+Run:
+
+```powershell
+npm run dev --workspace apps/web
+```
+
+Then open `/login` and verify:
+- The page no longer looks empty or provisional
+- The warm background has depth instead of flat black
+- The single card is the focal point
+- The Google CTA is the strongest visual action
+- The page reads well on desktop and mobile widths
+
+- [ ] **Step 5: Commit after validation if any polish was needed**
+
+```bash
+git add apps/web/app/(auth)/login/page.tsx
+git commit -m "chore: polish login layout validation"
+```
+
+---
+
+## Self-Review
+
+- Spec coverage: the plan covers background, top context, main card, compact benefits, optional support cards, accessibility semantics, responsive behavior, and unchanged auth flow.
+- Placeholder scan: no TBDs or deferred implementation markers remain.
+- Type consistency: the plan keeps the page as a server component and reuses `signIn("google")` consistently.
