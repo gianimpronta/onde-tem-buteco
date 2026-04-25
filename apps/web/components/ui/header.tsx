@@ -10,12 +10,13 @@ export default async function Header() {
       <header className="rounded-3xl border border-zinc-200 bg-white px-4 py-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:px-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <Link href="/">
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
-              Comida di Buteco
-            </p>
-            <p className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
-              Onde Tem Buteco
-            </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-wordmark.svg"
+              alt="Onde Tem Buteco"
+              height={48}
+              className="h-12 w-auto"
+            />
           </Link>
 
           <nav className="flex flex-wrap items-center gap-2">

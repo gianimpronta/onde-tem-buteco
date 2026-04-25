@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" fill="none">
+  <g>
+    
+    <g transform="translate(0 0)">
+      <circle cx="52" cy="60" r="48" fill="#6E1E18"></circle>
+      <circle cx="52" cy="60" r="40" fill="#CE9A24"></circle>
+      <circle cx="52" cy="60" r="36" fill="none" stroke="#6E1E18" stroke-width="1.3"></circle>
+      <text x="52" y="56" text-anchor="middle" font-family="Familjen Grotesk, sans-serif" font-weight="700" font-size="22" fill="#6E1E18" letter-spacing="-0.5">OTB</text>
+      <text x="52" y="72" text-anchor="middle" font-family="DM Mono, monospace" font-weight="500" font-size="6.5" fill="#6E1E18" letter-spacing="2">BUTECO</text>
+    </g>
+    
+    <text x="112" y="58" font-family="Familjen Grotesk, sans-serif" font-weight="700" font-size="34" fill="#6E1E18" letter-spacing="-1">onde tem</text>
+    <text x="112" y="94" font-family="Familjen Grotesk, sans-serif" font-weight="700" font-size="42" fill="#1A120B" letter-spacing="-1.4">buteco.</text>
+  </g>
+</svg>
