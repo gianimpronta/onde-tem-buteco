@@ -1,6 +1,7 @@
 jest.mock("next/font/google", () => ({
-  Geist: () => ({ variable: "--font-geist-sans" }),
-  Geist_Mono: () => ({ variable: "--font-geist-mono" }),
+  Familjen_Grotesk: () => ({ variable: "--font-familjen-grotesk" }),
+  Inter_Tight: () => ({ variable: "--font-inter-tight" }),
+  DM_Mono: () => ({ variable: "--font-dm-mono" }),
 }));
 
 jest.mock("@vercel/analytics/next", () => ({
