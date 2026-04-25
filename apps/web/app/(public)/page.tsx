@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MapaButecosShell } from "@/components/mapa/mapa-butecos-shell";
 import { getHomeData } from "@/lib/public-butecos";
 
@@ -11,17 +12,30 @@ export default async function Home() {
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-5 sm:gap-8 sm:px-6 sm:py-8 lg:px-8">
-      <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-7">
-        <h1 className="text-3xl font-black leading-tight tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
-          Descubra os botecos no mapa
-        </h1>
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-lg">
-          Explore os participantes do Comida di Buteco, filtre por região e encontre seu próximo
-          destino.
-        </p>
+      <section className="relative overflow-hidden rounded-3xl bg-surface p-5 sm:p-7">
+        <div className="grao absolute inset-0" aria-hidden />
+        <div className="relative">
+          <h1 className="font-display text-[42px] font-bold leading-tight tracking-tight text-tinto-700 sm:text-[52px]">
+            Descubra os botecos no mapa
+          </h1>
+          <p className="mt-3 max-w-2xl font-body text-[15px] leading-relaxed text-ink-soft sm:text-[17px]">
+            Explore os participantes do Comida di Buteco, filtre por região e encontre seu próximo
+            destino.
+          </p>
 
-        <div className="mt-5 inline-flex items-center rounded-full bg-amber-100 px-4 py-2 text-sm font-bold text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-          {total > 0 ? `${total} botecos participando` : "Em breve: botecos participantes no mapa"}
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            {total > 0 && (
+              <span className="inline-flex items-center rounded-full bg-mostarda-100 px-4 py-2 font-mono text-[12px] font-bold text-mostarda-700">
+                {total} botecos participando
+              </span>
+            )}
+            <Link
+              href="/butecos"
+              className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-[14px] font-medium text-primary-ink transition hover:bg-terracota-600"
+            >
+              Ver botecos
+            </Link>
+          </div>
         </div>
       </section>
 
