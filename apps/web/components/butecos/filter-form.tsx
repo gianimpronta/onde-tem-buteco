@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   cidadeOptions: string[];
@@ -28,22 +29,22 @@ export function ButecosFilterForm({ cidadeOptions, bairroOptions }: Props) {
   return (
     <form className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_auto_auto] lg:items-end">
       <label className="flex min-w-0 flex-col gap-2 sm:col-span-2 lg:col-span-1">
-        <span className="text-sm font-semibold text-zinc-800">Buscar</span>
+        <span className="font-body text-[13px] font-semibold text-ink">Buscar</span>
         <input
           name="q"
           defaultValue={q}
           placeholder="Nome do buteco ou petisco"
-          className="w-full rounded-2xl border border-zinc-200 px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400"
+          className="w-full rounded-full border border-line px-4 py-2.5 font-body text-[14px] text-ink outline-none transition focus:border-primary"
         />
       </label>
 
       <label className="flex min-w-0 flex-col gap-2">
-        <span className="text-sm font-semibold text-zinc-800">Cidade</span>
+        <span className="font-body text-[13px] font-semibold text-ink">Cidade</span>
         <select
           name="cidade"
           value={cidade}
           onChange={onCidadeChange}
-          className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400"
+          className="w-full rounded-full border border-line bg-surface px-4 py-2.5 font-body text-[14px] text-ink outline-none transition focus:border-primary"
         >
           <option value="">Todas as cidades</option>
           {cidadeOptions.map((c) => (
@@ -55,13 +56,13 @@ export function ButecosFilterForm({ cidadeOptions, bairroOptions }: Props) {
       </label>
 
       <label className="flex min-w-0 flex-col gap-2">
-        <span className="text-sm font-semibold text-zinc-800">Bairro</span>
+        <span className="font-body text-[13px] font-semibold text-ink">Bairro</span>
         <select
           key={cidade}
           name="bairro"
           defaultValue={bairro}
           disabled={bairroOptions.length === 0}
-          className="w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition focus:border-amber-400 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400"
+          className="w-full rounded-full border border-line bg-surface px-4 py-2.5 font-body text-[14px] text-ink outline-none transition focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
         >
           <option value="">Todos os bairros</option>
           {bairroOptions.map((b) => (
@@ -72,16 +73,13 @@ export function ButecosFilterForm({ cidadeOptions, bairroOptions }: Props) {
         </select>
       </label>
 
-      <button
-        type="submit"
-        className="rounded-2xl bg-amber-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
-      >
+      <Button type="submit" variant="primary" size="sm">
         Aplicar filtros
-      </button>
+      </Button>
 
       <Link
         href="/butecos"
-        className="rounded-2xl border border-zinc-200 px-5 py-3 text-center text-sm font-semibold text-zinc-700 transition hover:border-amber-300 hover:bg-amber-50"
+        className="inline-flex items-center justify-center rounded-full border border-tinto-700 px-4 py-2 text-[13px] font-medium text-tinto-700 transition hover:bg-terracota-100"
       >
         Limpar
       </Link>
