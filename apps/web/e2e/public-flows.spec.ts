@@ -35,7 +35,7 @@ test("carrega a home publica com os elementos principais", async ({ page }) => {
 test("navega da home para a listagem de botecos", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByRole("link", { name: "Ver botecos" }).click();
+  await page.getByRole("main").getByRole("link", { name: "Ver botecos" }).click();
 
   await expect(page).toHaveURL(/\/butecos$/);
   await expect(page.getByRole("heading", { name: "Botecos" })).toBeVisible();
@@ -87,7 +87,7 @@ test("exibe estado vazio quando nao ha resultados", async ({ page }) => {
   await page.getByRole("button", { name: "Aplicar filtros" }).click();
 
   await expect(page).toHaveURL(/q=Inexistente/);
-  await expect(page.getByRole("heading", { name: "Nenhum boteco encontrado" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Nenhum buteco encontrado por aqui" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Limpar filtros" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Voltar para a home" })).toBeVisible();
 });

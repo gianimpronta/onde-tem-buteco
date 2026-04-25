@@ -10,6 +10,7 @@ export type PublicButecoListItem = {
   cidade: string;
   bairro: string | null;
   petiscoNome: string | null;
+  fotoUrl: string | null;
 };
 
 export type PublicButecoMapItem = {
@@ -201,13 +202,14 @@ export async function getButecosPageData(filters: ButecoSearchFilters) {
       cidades,
       bairros,
       butecos: filteredButecos.map(
-        ({ slug, nome, cidade, bairro, petiscoNome }) =>
+        ({ slug, nome, cidade, bairro, petiscoNome, fotoUrl }) =>
           ({
             slug,
             nome,
             cidade,
             bairro,
             petiscoNome,
+            fotoUrl,
           }) satisfies PublicButecoListItem
       ),
     };
@@ -240,6 +242,7 @@ export async function getButecosPageData(filters: ButecoSearchFilters) {
         cidade: true,
         bairro: true,
         petiscoNome: true,
+        fotoUrl: true,
       },
     }),
   ]);
