@@ -76,6 +76,7 @@ describe("public-butecos fixtures", () => {
         cidade: "Belo Horizonte",
         bairro: "Savassi",
         petiscoNome: "Bolinho da Casa",
+        fotoUrl: null,
       },
     ]);
   });
