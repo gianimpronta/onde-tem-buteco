@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Carimbo } from "@/components/ui/carimbo";
 
 export default async function MinhaContaPage() {
   const session = await auth();
@@ -17,26 +19,42 @@ export default async function MinhaContaPage() {
   if (!user) redirect("/login");
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-8 space-y-10">
-      <h1 className="text-3xl font-bold dark:text-zinc-50">Minha Conta</h1>
+    <main className="mx-auto max-w-2xl space-y-10 px-4 py-8">
+      <h1 className="font-display text-[28px] font-bold text-ink">Minha Conta</h1>
 
       <section>
-        <h2 className="text-xl font-semibold mb-4 dark:text-zinc-100">Favoritos</h2>
+        <h2 className="mb-4 font-display text-[20px] font-semibold text-ink">Favoritos</h2>
         {user.favoritos.length === 0 ? (
-          <p className="text-zinc-500 dark:text-zinc-400">Nenhum favorito ainda.</p>
+          <div className="text-center">
+            <p className="font-body text-[14px] text-ink-muted">
+              Nenhum favorito ainda — bora explorar?
+            </p>
+            <Link
+              href="/butecos"
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-[13px] font-medium text-primary-ink transition hover:bg-terracota-600"
+            >
+              Ver botecos
+            </Link>
+          </div>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {user.favoritos.map(({ buteco }) => (
-              <li key={buteco.slug}>
-                <a
-                  href={`/butecos/${buteco.slug}`}
-                  className="font-medium hover:underline dark:text-zinc-200"
-                >
-                  {buteco.nome}
-                </a>
-                <span className="text-zinc-500 text-sm ml-2 dark:text-zinc-400">
-                  {buteco.cidade}
-                </span>
+              <li key={buteco.slug} className="flex items-center gap-3">
+                <Carimbo
+                  nome={buteco.nome}
+                  bairro={buteco.bairro ?? undefined}
+                  size="xs"
+                  color="mostarda"
+                />
+                <div>
+                  <Link
+                    href={`/butecos/${buteco.slug}`}
+                    className="font-body font-medium text-ink transition hover:text-primary"
+                  >
+                    {buteco.nome}
+                  </Link>
+                  <p className="font-mono text-[11px] text-ink-muted">{buteco.cidade}</p>
+                </div>
               </li>
             ))}
           </ul>
@@ -44,22 +62,42 @@ export default async function MinhaContaPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold mb-4 dark:text-zinc-100">Visitados</h2>
+        <h2 className="mb-4 font-display text-[20px] font-semibold text-ink">
+          Butecos que você conheceu
+        </h2>
         {user.visitas.length === 0 ? (
-          <p className="text-zinc-500 dark:text-zinc-400">Nenhuma visita registrada.</p>
+          <div className="text-center">
+            <p className="font-body text-[14px] text-ink-muted">
+              Nenhum carimbo ainda — bora conhecer um buteco?
+            </p>
+            <Link
+              href="/butecos"
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-[13px] font-medium text-primary-ink transition hover:bg-terracota-600"
+            >
+              Ver botecos
+            </Link>
+          </div>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {user.visitas.map(({ buteco, visitadoEm }) => (
-              <li key={buteco.slug}>
-                <a
-                  href={`/butecos/${buteco.slug}`}
-                  className="font-medium hover:underline dark:text-zinc-200"
-                >
-                  {buteco.nome}
-                </a>
-                <span className="text-zinc-500 text-sm ml-2 dark:text-zinc-400">
-                  {visitadoEm.toLocaleDateString("pt-BR")}
-                </span>
+              <li key={buteco.slug} className="flex items-center gap-3">
+                <Carimbo
+                  nome={buteco.nome}
+                  bairro={buteco.bairro ?? undefined}
+                  size="xs"
+                  color="tinto"
+                />
+                <div>
+                  <Link
+                    href={`/butecos/${buteco.slug}`}
+                    className="font-body font-medium text-ink transition hover:text-primary"
+                  >
+                    {buteco.nome}
+                  </Link>
+                  <p className="font-mono text-[11px] text-ink-muted">
+                    {visitadoEm.toLocaleDateString("pt-BR")}
+                  </p>
+                </div>
               </li>
             ))}
           </ul>

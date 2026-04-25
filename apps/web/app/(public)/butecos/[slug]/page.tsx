@@ -68,40 +68,49 @@ export default async function ButecoPage({
   });
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-8">
+    <main className="mx-auto max-w-2xl px-4 py-8">
       <Link
         href="/butecos"
-        className="text-sm text-zinc-500 hover:underline mb-4 block dark:text-zinc-400"
+        className="mb-6 block font-body text-[13px] text-ink-muted transition hover:text-ink"
       >
-        ← Voltar
+        ← Botecos
       </Link>
-      {buteco.fotoUrl && (
-        <Image
-          src={buteco.fotoUrl}
-          alt={buteco.nome}
-          width={800}
-          height={224}
-          className="w-full h-56 object-cover rounded-xl mb-6"
-        />
+
+      {buteco.fotoUrl ? (
+        <div className="relative mb-6 aspect-[4/2.6] w-full overflow-hidden rounded-[14px]">
+          <Image src={buteco.fotoUrl} alt={buteco.nome} fill className="object-cover" />
+        </div>
+      ) : (
+        <div className="mb-6 aspect-[4/2.6] w-full rounded-[14px] bg-terracota-100" />
       )}
-      <h1 className="text-3xl font-bold dark:text-zinc-50">{buteco.nome}</h1>
-      <p className="text-zinc-500 mt-1 dark:text-zinc-400">
-        {buteco.bairro ? `${buteco.bairro}, ` : ""}
+
+      <h1 className="font-display text-[34px] font-bold leading-tight tracking-tight text-ink">
+        {buteco.nome}
+      </h1>
+      <p className="mt-1 font-mono text-[13px] text-ink-muted">
+        {buteco.bairro ? `${buteco.bairro} · ` : ""}
         {buteco.cidade}
       </p>
+
       {buteco.petiscoNome && (
         <div className="mt-6">
-          <h2 className="font-semibold text-amber-600 dark:text-amber-400">{buteco.petiscoNome}</h2>
+          <h2 className="font-display text-[20px] font-semibold text-tinto-700">
+            {buteco.petiscoNome}
+          </h2>
           {buteco.petiscoDesc && (
-            <p className="text-zinc-600 mt-1 dark:text-zinc-400">{buteco.petiscoDesc}</p>
+            <p className="mt-1 font-body text-[15px] leading-relaxed text-ink-soft">
+              {buteco.petiscoDesc}
+            </p>
           )}
         </div>
       )}
-      <div className="mt-6 space-y-1 text-sm text-zinc-500 dark:text-zinc-400">
+
+      <div className="mt-6 space-y-1 font-mono text-[13px] text-ink-muted">
         {buteco.endereco && <p>{buteco.endereco}</p>}
         {buteco.telefone && <p>{buteco.telefone}</p>}
         {buteco.horario && <p>{buteco.horario}</p>}
       </div>
+
       <ButecoActionPanel
         butecoId={buteco.id}
         loginHref={actionState.loginHref}
