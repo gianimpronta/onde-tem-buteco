@@ -6,8 +6,14 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "comidadibuteco.com.br" },
-      { protocol: "https", hostname: "*.comidadibuteco.com.br" },
+      {
+        protocol: "https",
+        hostname: "comidadibuteco.com.br",
+      },
+      {
+        protocol: "https",
+        hostname: "*.comidadibuteco.com.br",
+      },
     ],
   },
 };
