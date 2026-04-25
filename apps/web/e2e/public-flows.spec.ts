@@ -105,7 +105,7 @@ test("renderiza os dados principais da pagina de detalhe", async ({ page }) => {
   await page.goto("/butecos/bar-do-zeca");
 
   await expect(page.getByRole("heading", { name: "Bar do Zeca" })).toBeVisible();
-  await expect(page.getByText("Savassi · Belo Horizonte", { exact: true })).toBeVisible();
+  await expect(page.getByText("Savassi, Belo Horizonte", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Bolinho da Casa" })).toBeVisible();
   await expect(page.getByText("Rua dos Testes, 123 - Savassi, Belo Horizonte - MG")).toBeVisible();
   await expect(page.getByText("(31) 3333-1111")).toBeVisible();
