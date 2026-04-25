@@ -79,7 +79,7 @@ describe("ButecoPage", () => {
     render(await ButecoPage({ params: Promise.resolve({ slug: "bar-do-zeca" }) }));
 
     expect(screen.getByRole("heading", { name: "Bar do Zeca" })).toBeVisible();
-    expect(screen.getByText("Savassi, Belo Horizonte")).toBeVisible();
+    expect(screen.getByText("Savassi · Belo Horizonte")).toBeVisible();
     expect(screen.getByText("Rua dos Testes, 123 - Savassi, Belo Horizonte - MG")).toBeVisible();
     expect(screen.getByTestId("buteco-action-panel")).toHaveTextContent(
       JSON.stringify({
