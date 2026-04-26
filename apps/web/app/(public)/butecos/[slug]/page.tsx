@@ -103,11 +103,20 @@ export default async function ButecoPage({
         </div>
       )}
 
-      <div className="mt-6 space-y-1 font-mono text-[13px] text-ink-muted">
-        {buteco.endereco && <p>{buteco.endereco}</p>}
-        {buteco.telefone && <p>{buteco.telefone}</p>}
-        {buteco.horario && <p>{buteco.horario}</p>}
-      </div>
+      <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[13px] text-ink-muted">
+        {[buteco.endereco, buteco.telefone, buteco.horario]
+          .filter((item): item is string => Boolean(item))
+          .map((item, index) => (
+            <span key={item} className="contents">
+              {index > 0 && (
+                <span aria-hidden className="text-ink-muted/60">
+                  ·
+                </span>
+              )}
+              <span>{item}</span>
+            </span>
+          ))}
+      </p>
 
       <ButecoActionPanel
         butecoId={buteco.id}

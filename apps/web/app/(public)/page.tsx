@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MapaButecosShell } from "@/components/mapa/mapa-butecos-shell";
+import { buttonClassName } from "@/components/ui/button";
 import { getHomeData } from "@/lib/public-butecos";
 
 export const dynamic = "force-dynamic";
@@ -29,10 +30,7 @@ export default async function Home() {
                 {total} botecos participando
               </span>
             )}
-            <Link
-              href="/butecos"
-              className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-[14px] font-medium text-primary-ink transition hover:bg-terracota-600"
-            >
+            <Link href="/butecos" className={buttonClassName({ variant: "primary" })}>
               Ver botecos
             </Link>
           </div>

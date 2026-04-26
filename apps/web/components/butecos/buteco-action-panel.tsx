@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 type ButecoActionPanelProps = {
   butecoId: string;
@@ -89,9 +90,9 @@ export default function ButecoActionPanel({
   }
 
   return (
-    <section className="mt-8 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60">
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Suas ações</h2>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+    <section className="mt-8 rounded-[14px] border border-line-soft bg-surface-alt p-5">
+      <h2 className="font-display text-[18px] font-semibold text-ink">Suas ações</h2>
+      <p className="mt-1 font-body text-[14px] text-ink-soft">
         Salve este buteco ou registre que ele já entrou no seu roteiro.
       </p>
 
@@ -99,38 +100,38 @@ export default function ButecoActionPanel({
         <div className="mt-4">
           <Link
             href={loginHref}
-            className="inline-flex rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-amber-600"
+            className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-[14px] font-medium text-primary-ink transition hover:bg-terracota-600"
           >
             Faça login para favoritar e registrar visita
           </Link>
         </div>
       ) : (
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-          <button
+          <Button
             type="button"
-            onClick={handleFavoritoClick}
-            disabled={pendingAction !== null}
-            className="rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-800 transition hover:border-amber-400 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-100 dark:hover:border-amber-500 dark:hover:bg-amber-950/40"
-          >
-            {isFavorito ? "Remover dos favoritos" : "Favoritar"}
-          </button>
-          <button
-            type="button"
+            variant="primary"
             onClick={handleVisitaClick}
             disabled={isVisitado || pendingAction !== null}
-            className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-800/70"
+            className="disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isVisitado ? "Visitado" : "Marcar como visitado"}
-          </button>
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleFavoritoClick}
+            disabled={pendingAction !== null}
+            className="disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isFavorito ? "Remover dos favoritos" : "Favoritar"}
+          </Button>
         </div>
       )}
 
       {feedback ? (
         <p
-          className={`mt-3 text-sm ${
-            feedback.type === "error"
-              ? "text-red-600 dark:text-red-400"
-              : "text-emerald-700 dark:text-emerald-400"
+          className={`mt-3 font-body text-[13px] ${
+            feedback.type === "error" ? "text-danger" : "text-positive"
           }`}
         >
           {feedback.message}

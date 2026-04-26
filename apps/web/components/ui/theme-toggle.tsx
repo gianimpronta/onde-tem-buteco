@@ -49,7 +49,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={theme === "dark" ? "Mudar para tema claro" : "Mudar para tema escuro"}
-      className="rounded-full border border-zinc-200 p-2 text-zinc-600 transition hover:border-amber-300 hover:bg-amber-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-amber-600 dark:hover:bg-amber-900/20"
+      className="rounded-full border border-line p-2 text-ink-soft transition hover:border-tinto-700 hover:bg-mostarda-100 hover:text-tinto-700"
     >
       {theme === "dark" ? (
         <svg

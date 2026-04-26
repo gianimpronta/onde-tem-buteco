@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ButecosFilterForm } from "@/components/butecos/filter-form";
 import { ButecoCard } from "@/components/butecos/buteco-card";
+import { buttonClassName } from "@/components/ui/button";
 import { countActiveButecoFilters, normalizeButecoFilters } from "@/lib/buteco-filters";
 import { getButecosPageData } from "@/lib/public-butecos";
 
@@ -65,16 +66,10 @@ export default async function ButecosPage({
             Tente outro bairro ou limpa os filtros.
           </p>
           <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
-              href="/butecos"
-              className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-[13px] font-medium text-primary-ink transition hover:bg-terracota-600"
-            >
+            <Link href="/butecos" className={buttonClassName({ variant: "primary", size: "sm" })}>
               Limpar filtros
             </Link>
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center rounded-full border border-tinto-700 px-5 py-2.5 font-body text-[13px] font-medium text-tinto-700 transition hover:bg-terracota-100"
-            >
+            <Link href="/" className={buttonClassName({ variant: "secondary", size: "sm" })}>
               Voltar para a home
             </Link>
           </div>
