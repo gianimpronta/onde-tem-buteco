@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 type Buteco = {
   nome: string;
@@ -16,16 +19,24 @@ type ButecoCardProps = {
 };
 
 export function ButecoCard({ buteco, variant }: ButecoCardProps) {
-  const resolvedVariant = variant ?? (buteco.fotoUrl ? "photo" : "flat");
+  const [imageError, setImageError] = useState(false);
+  const resolvedVariant = variant ?? (buteco.fotoUrl && !imageError ? "photo" : "flat");
 
-  if (resolvedVariant === "photo" && buteco.fotoUrl) {
+  if (resolvedVariant === "photo" && buteco.fotoUrl && !imageError) {
     return (
       <Link
         href={`/butecos/${buteco.slug}`}
         className="block overflow-hidden rounded-[14px] border border-line-soft bg-white shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
       >
         <div className="relative aspect-[4/2.6] w-full overflow-hidden">
-          <Image src={buteco.fotoUrl} alt={buteco.nome} fill className="object-cover" />
+          <Image
+            src={buteco.fotoUrl}
+            alt={buteco.nome}
+            fill
+            unoptimized
+            className="object-cover"
+            onError={() => setImageError(true)}
+          />
         </div>
         <div className="p-4">
           <p className="font-body text-[12px] font-medium uppercase tracking-wide text-ink-muted">
