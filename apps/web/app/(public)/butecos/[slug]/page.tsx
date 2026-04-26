@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ButecoActionPanel from "@/components/butecos/buteco-action-panel";
+import { ButecoDetailImage } from "@/components/butecos/buteco-detail-image";
 import { getButecoActionState } from "@/lib/detail-actions";
 import { getButecoBySlug } from "@/lib/public-butecos";
 
@@ -77,9 +77,7 @@ export default async function ButecoPage({
       </Link>
 
       {buteco.fotoUrl ? (
-        <div className="relative mb-6 aspect-[4/2.6] w-full overflow-hidden rounded-[14px]">
-          <Image src={buteco.fotoUrl} alt={buteco.nome} fill className="object-cover" />
-        </div>
+        <ButecoDetailImage src={buteco.fotoUrl} alt={buteco.nome} />
       ) : (
         <div className="mb-6 aspect-[4/2.6] w-full rounded-[14px] bg-terracota-100" />
       )}
