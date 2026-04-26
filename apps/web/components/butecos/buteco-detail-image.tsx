@@ -21,7 +21,7 @@ export function ButecoDetailImage({ src, alt }: Props) {
         src={src}
         alt={alt}
         fill
-        sizes="(max-width: 672px) 100vw, 672px"
+        unoptimized
         className="object-cover"
         onError={() => setFailed(true)}
       />
