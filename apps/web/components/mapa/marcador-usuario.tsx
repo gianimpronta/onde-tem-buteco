@@ -6,7 +6,7 @@ import { Marker, Popup, useMap } from "react-leaflet";
 
 const iconeUsuario = L.divIcon({
   className: "",
-  html: '<div style="width:18px;height:18px;background:#2563eb;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(37,99,235,0.5)"></div>',
+  html: '<div style="width:18px;height:18px;background:#C9683C;border:3px solid #FFFBF2;border-radius:50%;box-shadow:0 2px 8px rgba(140,66,30,0.5)"></div>',
   iconSize: [18, 18],
   iconAnchor: [9, 9],
 });

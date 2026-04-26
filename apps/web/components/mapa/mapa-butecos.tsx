@@ -32,17 +32,17 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
 
   if (butecos.length === 0) {
     return (
-      <div className="flex min-h-[42vh] w-full flex-col items-center justify-center rounded-3xl border border-zinc-200 bg-white px-6 py-12 text-center shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:min-h-[48vh]">
-        <p className="text-xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-2xl">
+      <div className="flex min-h-[42vh] w-full flex-col items-center justify-center rounded-[14px] border border-line-soft bg-surface-alt px-6 py-12 text-center shadow-warm-sm sm:min-h-[48vh]">
+        <p className="font-display text-[22px] font-bold text-ink sm:text-[26px]">
           Mapa em atualização
         </p>
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-base">
+        <p className="mt-3 max-w-xl font-body text-[14px] leading-relaxed text-ink-soft sm:text-[15px]">
           Ainda não existem botecos com geolocalização disponível. Enquanto isso, você já pode
           conferir a lista completa dos participantes.
         </p>
         <Link
           href="/butecos"
-          className="mt-6 rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-600"
+          className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-[14px] font-medium text-primary-ink transition hover:bg-terracota-600"
         >
           Ver lista de botecos
         </Link>
@@ -51,15 +51,15 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
   }
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+    <div className="overflow-hidden rounded-[14px] border border-line-soft bg-surface-alt shadow-warm-sm">
       {erro && (
-        <div className="flex items-center gap-2 border-b border-red-100 bg-red-50 px-4 py-2.5 text-sm text-red-700 dark:border-red-950 dark:bg-red-950/40 dark:text-red-300">
+        <div className="flex items-center gap-2 border-b border-line-soft bg-terracota-100 px-4 py-2.5 font-body text-[13px] text-tinto-700">
           <span aria-hidden="true">⚠</span>
           {erro}
         </div>
       )}
       {coords && !erro && (
-        <div className="flex items-center gap-2 border-b border-emerald-100 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-700 dark:border-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <div className="flex items-center gap-2 border-b border-line-soft bg-mostarda-100 px-4 py-2.5 font-body text-[13px] text-mostarda-700">
           <span aria-hidden="true">📍</span>
           Usando sua localização para destacar o mapa.
         </div>
@@ -69,7 +69,7 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
           onClick={buscar}
           disabled={carregando}
           aria-label="Usar minha localização"
-          className="absolute right-3 top-3 z-[1000] flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-md transition hover:bg-zinc-50 disabled:cursor-wait disabled:opacity-70 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+          className="absolute right-3 top-3 z-[1000] flex items-center gap-1.5 rounded-full bg-surface-alt px-3 py-1.5 font-body text-[12px] font-medium text-ink-soft shadow-warm transition hover:bg-cream-100 disabled:cursor-wait disabled:opacity-70"
         >
           <span aria-hidden="true">{carregando ? "⏳" : "📍"}</span>
           {carregando ? "Localizando..." : "Usar minha localização"}
@@ -88,11 +88,13 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
             <Marker key={buteco.slug} position={[buteco.lat, buteco.lng]}>
               <Popup>
                 <div className="space-y-1">
-                  <p className="font-semibold">{buteco.nome}</p>
-                  <p className="text-sm text-zinc-600">{buteco.bairro ?? "Bairro não informado"}</p>
+                  <p className="font-display font-semibold text-ink">{buteco.nome}</p>
+                  <p className="font-mono text-[12px] text-ink-muted">
+                    {buteco.bairro ?? "Bairro não informado"}
+                  </p>
                   <Link
                     href={`/butecos/${buteco.slug}`}
-                    className="text-sm text-amber-700 hover:underline"
+                    className="font-body text-[13px] font-medium text-tinto-700 hover:underline"
                   >
                     Ver detalhes
                   </Link>
