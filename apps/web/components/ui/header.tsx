@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { isE2EFixtureMode } from "@/lib/public-butecos";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClassName } from "@/components/ui/button";
 
 export default async function Header() {
   const session = isE2EFixtureMode()
@@ -48,10 +48,7 @@ export default async function Header() {
               </form>
             </>
           ) : (
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-[13px] font-medium text-primary-ink transition hover:bg-terracota-600"
-            >
+            <Link href="/login" className={buttonClassName({ variant: "primary", size: "sm" })}>
               Login
             </Link>
           )}

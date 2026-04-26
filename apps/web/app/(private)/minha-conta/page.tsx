@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Carimbo } from "@/components/ui/carimbo";
+import { buttonClassName } from "@/components/ui/button";
 
 export default async function MinhaContaPage() {
   const session = await auth();
@@ -31,7 +32,7 @@ export default async function MinhaContaPage() {
             </p>
             <Link
               href="/butecos"
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-[13px] font-medium text-primary-ink transition hover:bg-terracota-600"
+              className={`mt-4 ${buttonClassName({ variant: "primary", size: "sm" })}`}
             >
               Ver botecos
             </Link>
@@ -72,7 +73,7 @@ export default async function MinhaContaPage() {
             </p>
             <Link
               href="/butecos"
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 font-body text-[13px] font-medium text-primary-ink transition hover:bg-terracota-600"
+              className={`mt-4 ${buttonClassName({ variant: "primary", size: "sm" })}`}
             >
               Ver botecos
             </Link>
