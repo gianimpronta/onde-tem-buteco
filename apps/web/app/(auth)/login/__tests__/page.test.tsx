@@ -25,12 +25,8 @@ describe("LoginPage", () => {
     const element = await LoginPage({ searchParams: Promise.resolve({}) });
     render(element);
 
-    expect(
-      screen.getByRole("heading", { name: /Continue o rolê de buteco/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Entrar com Google/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Continue o rolê de buteco/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Entrar com Google/i })).toBeInTheDocument();
   });
 
   it("redireciona para '/' quando usuário já está autenticado", async () => {
@@ -57,5 +53,15 @@ describe("LoginPage", () => {
     const element = await LoginPage({ searchParams: Promise.resolve({}) });
 
     expect(element).toBeNull();
+  });
+
+  it("ignora callbackUrl absoluto e redireciona para '/'", async () => {
+    (auth as jest.Mock).mockResolvedValue({ user: { id: "u1", email: "a@b.com" } });
+
+    await LoginPage({
+      searchParams: Promise.resolve({ callbackUrl: "https://evil.com" }),
+    });
+
+    expect(redirect).toHaveBeenCalledWith("/");
   });
 });
