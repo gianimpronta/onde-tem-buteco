@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  
+  <defs>
+    <clipPath id="cap"><circle cx="60" cy="60" r="54"></circle></clipPath>
+  </defs>
+  <g>
+    
+    <g fill="#6E1E18">
+      <circle cx="60" cy="60" r="56"></circle>
+    </g>
+    <g fill="#FBF6EC">
+      
+      <g id="scallop">
+        <circle cx="60" cy="4" r="4"></circle>
+      </g>
+      <use href="#scallop" transform="rotate(18 60 60)"></use>
+      <use href="#scallop" transform="rotate(36 60 60)"></use>
+      <use href="#scallop" transform="rotate(54 60 60)"></use>
+      <use href="#scallop" transform="rotate(72 60 60)"></use>
+      <use href="#scallop" transform="rotate(90 60 60)"></use>
+      <use href="#scallop" transform="rotate(108 60 60)"></use>
+      <use href="#scallop" transform="rotate(126 60 60)"></use>
+      <use href="#scallop" transform="rotate(144 60 60)"></use>
+      <use href="#scallop" transform="rotate(162 60 60)"></use>
+      <use href="#scallop" transform="rotate(180 60 60)"></use>
+      <use href="#scallop" transform="rotate(198 60 60)"></use>
+      <use href="#scallop" transform="rotate(216 60 60)"></use>
+      <use href="#scallop" transform="rotate(234 60 60)"></use>
+      <use href="#scallop" transform="rotate(252 60 60)"></use>
+      <use href="#scallop" transform="rotate(270 60 60)"></use>
+      <use href="#scallop" transform="rotate(288 60 60)"></use>
+      <use href="#scallop" transform="rotate(306 60 60)"></use>
+      <use href="#scallop" transform="rotate(324 60 60)"></use>
+      <use href="#scallop" transform="rotate(342 60 60)"></use>
+    </g>
+    
+    <circle cx="60" cy="60" r="46" fill="#CE9A24"></circle>
+    
+    <circle cx="60" cy="60" r="42" fill="none" stroke="#6E1E18" stroke-width="1.5"></circle>
+    
+    <text x="60" y="54" text-anchor="middle" font-family="Familjen Grotesk, sans-serif" font-weight="700" font-size="28" fill="#6E1E18" letter-spacing="-1">OTB</text>
+    <text x="60" y="74" text-anchor="middle" font-family="DM Mono, monospace" font-weight="500" font-size="8" fill="#6E1E18" letter-spacing="2">BUTECO·BR</text>
+    
+    <circle cx="60" cy="84" r="1.6" fill="#6E1E18"></circle>
+    <circle cx="54" cy="84" r="1.6" fill="#6E1E18"></circle>
+    <circle cx="66" cy="84" r="1.6" fill="#6E1E18"></circle>
+  </g>
+</svg>
