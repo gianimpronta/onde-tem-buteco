@@ -13,18 +13,12 @@ const sizeConfig = {
 };
 
 const colorConfig = {
-  tinto: "border-tinto-700 text-tinto-700",
-  mostarda: "border-mostarda-700 text-mostarda-700",
-  mata: "border-mata-700 text-mata-700",
+  tinto: "border-tinto-700 text-tinto-700 dark:border-brand dark:text-brand",
+  mostarda: "border-mostarda-700 text-mostarda-700 dark:border-accent dark:text-accent",
+  mata: "border-mata-700 text-mata-700 dark:border-positive dark:text-positive",
 };
 
-export function Carimbo({
-  nome,
-  bairro,
-  numero,
-  size = "lg",
-  color = "tinto",
-}: CarimboProps) {
+export function Carimbo({ nome, bairro, numero, size = "lg", color = "tinto" }: CarimboProps) {
   const { dim, text, rotate } = sizeConfig[size];
   const showDetails = size === "lg";
   return (

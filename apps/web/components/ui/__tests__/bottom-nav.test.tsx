@@ -49,9 +49,6 @@ describe("BottomNav", () => {
 
   it("nav element has descriptive aria-label", () => {
     render(<BottomNav />);
-    expect(screen.getByRole("navigation")).toHaveAttribute(
-      "aria-label",
-      "Navegação principal"
-    );
+    expect(screen.getByRole("navigation")).toHaveAttribute("aria-label", "Navegação principal");
   });
 });

@@ -79,7 +79,7 @@ export default async function ButecoPage({
       {buteco.fotoUrl ? (
         <ButecoDetailImage src={buteco.fotoUrl} alt={buteco.nome} />
       ) : (
-        <div className="mb-6 aspect-[4/2.6] w-full rounded-[14px] bg-terracota-100" />
+        <div className="mb-6 aspect-[4/2.6] w-full rounded-[14px] bg-terracota-100 dark:bg-surface" />
       )}
 
       <h1 className="font-display text-[34px] font-bold leading-tight tracking-tight text-ink">
@@ -92,7 +92,7 @@ export default async function ButecoPage({
 
       {buteco.petiscoNome && (
         <div className="mt-6">
-          <h2 className="font-display text-[20px] font-semibold text-tinto-700">
+          <h2 className="font-display text-[20px] font-semibold text-brand">
             {buteco.petiscoNome}
           </h2>
           {buteco.petiscoDesc && (

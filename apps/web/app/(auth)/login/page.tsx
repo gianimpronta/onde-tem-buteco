@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: Props) {
   const destination = safeCallbackUrl;
 
   return (
-    <main className="grao flex min-h-screen items-center justify-center bg-cream-50">
+    <main className="grao flex min-h-screen items-center justify-center bg-bg">
       <div className="animate-fade-slide-up flex w-full max-w-[260px] flex-col items-center gap-6 px-6">
         {/* Logo */}
         <div
@@ -34,13 +34,10 @@ export default async function LoginPage({ searchParams }: Props) {
 
         {/* Texto */}
         <div className="flex flex-col gap-2 text-center">
-          <h1 className="font-display text-2xl font-bold leading-[1.05] tracking-[-0.02em] text-breu-900">
+          <h1 className="font-display text-2xl font-bold leading-[1.05] tracking-[-0.02em] text-ink">
             Continue o rolê de buteco.
           </h1>
-          <p
-            className="font-mono text-[11px] leading-[1.55]"
-            style={{ color: "rgba(74,20,15,0.62)" }}
-          >
+          <p className="font-mono text-[11px] leading-[1.55] text-ink-muted">
             Favoritos, carimbos e roteiro —<br />
             sempre onde você parou.
           </p>
@@ -56,7 +53,7 @@ export default async function LoginPage({ searchParams }: Props) {
         >
           <button
             type="submit"
-            className="flex w-full items-center justify-center gap-[10px] rounded-full border border-[#dadce0] bg-white px-4 py-[11px] shadow-[0_1px_4px_rgba(0,0,0,.12)] transition-shadow duration-150 hover:shadow-[0_2px_8px_rgba(0,0,0,.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tinto-700 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-50"
+            className="flex w-full items-center justify-center gap-[10px] rounded-full border border-[#dadce0] bg-white px-4 py-[11px] shadow-[0_1px_4px_rgba(0,0,0,.12)] transition-shadow duration-150 hover:shadow-[0_2px_8px_rgba(0,0,0,.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg dark:border-line dark:bg-surface-alt"
           >
             <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
               <path
@@ -77,7 +74,7 @@ export default async function LoginPage({ searchParams }: Props) {
               />
             </svg>
             <span
-              className="text-[13px] font-medium tracking-[0.01em] text-[#3c4043]"
+              className="text-[13px] font-medium tracking-[0.01em] text-[#3c4043] dark:text-ink"
               style={{ fontFamily: "Roboto, ui-sans-serif, sans-serif" }}
             >
               Entrar com Google

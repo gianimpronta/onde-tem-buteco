@@ -3,129 +3,131 @@
 
 :root {
   /* Cream / bone surfaces */
-  --cream-50: #FBF6EC;
-  --cream-100: #F4ECDB;
-  --cream-200: #E9DCC0;
-  --cream-300: #D9C69E;
+  --cream-50: #fbf6ec;
+  --cream-100: #f4ecdb;
+  --cream-200: #e9dcc0;
+  --cream-300: #d9c69e;
 
   /* Terracota — CTA primário */
-  --terracota-100: #F7DDCE;
-  --terracota-300: #E6A279;
-  --terracota-500: #C9683C;
-  --terracota-600: #B05628;
-  --terracota-700: #8C421E;
+  --terracota-100: #f7ddce;
+  --terracota-300: #e6a279;
+  --terracota-500: #b45428;
+  --terracota-600: #9a4520;
+  --terracota-700: #8c421e;
 
   /* Mostarda — acento secundário */
-  --mostarda-100: #F7E4B2;
-  --mostarda-300: #E6C169;
-  --mostarda-500: #CE9A24;
-  --mostarda-600: #A97C17;
-  --mostarda-700: #7E5C10;
+  --mostarda-100: #f7e4b2;
+  --mostarda-300: #e6c169;
+  --mostarda-500: #ce9a24;
+  --mostarda-600: #a97c17;
+  --mostarda-700: #7e5c10;
 
   /* Tinto — headlines, brand */
-  --tinto-300: #C65B52;
-  --tinto-500: #9E3027;
-  --tinto-700: #6E1E18;
-  --tinto-900: #4A140F;
+  --tinto-300: #c65b52;
+  --tinto-500: #9e3027;
+  --tinto-700: #6e1e18;
+  --tinto-900: #4a140f;
 
   /* Breu — near-black text */
-  --breu-700: #3E2F22;
-  --breu-800: #2A1E14;
-  --breu-900: #1A120B;
+  --breu-700: #3e2f22;
+  --breu-800: #2a1e14;
+  --breu-900: #1a120b;
 
   /* Mata — sucesso, "aberto" */
-  --mata-500: #456B3E;
-  --mata-700: #2E4A2A;
+  --mata-500: #456b3e;
+  --mata-700: #2e4a2a;
 
   /* Semânticos */
-  --bg:          var(--cream-50);
-  --surface:     var(--cream-100);
-  --surface-alt: #FFFBF2;
-  --ink:         var(--breu-900);
-  --ink-soft:    var(--breu-700);
-  --ink-muted:   #7A6A58;
-  --line:        #D9C69E;
-  --line-soft:   #E9DCC0;
-  --brand:       var(--tinto-700);
-  --primary:     var(--terracota-500);
-  --primary-ink: #FFFBF2;
-  --accent:      var(--mostarda-500);
-  --positive:    var(--mata-500);
-  --danger:      var(--tinto-500);
+  --bg: var(--cream-50);
+  --surface: var(--cream-100);
+  --surface-alt: #fffbf2;
+  --ink: var(--breu-900);
+  --ink-soft: var(--breu-700);
+  --ink-muted: #76644f;
+  --line: #d9c69e;
+  --line-soft: #e9dcc0;
+  --brand: var(--tinto-700);
+  --primary: var(--terracota-500);
+  --primary-ink: #fffbf2;
+  --accent: var(--mostarda-500);
+  --positive: var(--mata-500);
+  --danger: var(--tinto-500);
 
   /* Shadows */
-  --shadow-warm-sm: 0 1px 2px rgba(74,20,15,.06), 0 1px 1px rgba(74,20,15,.04);
-  --shadow-warm:    0 2px 4px rgba(74,20,15,.06), 0 8px 20px -8px rgba(74,20,15,.14);
-  --shadow-warm-lg: 0 4px 8px rgba(74,20,15,.08), 0 24px 48px -16px rgba(74,20,15,.2);
+  --shadow-warm-sm: 0 1px 2px rgba(74, 20, 15, 0.06), 0 1px 1px rgba(74, 20, 15, 0.04);
+  --shadow-warm: 0 2px 4px rgba(74, 20, 15, 0.06), 0 8px 20px -8px rgba(74, 20, 15, 0.14);
+  --shadow-warm-lg: 0 4px 8px rgba(74, 20, 15, 0.08), 0 24px 48px -16px rgba(74, 20, 15, 0.2);
 }
 
 .dark {
-  --bg:          #1B1510;
-  --surface:     #251C14;
-  --surface-alt: #2E231A;
-  --ink:         #F4ECDB;
-  --ink-soft:    #D9C69E;
-  --ink-muted:   #9E8B73;
-  --line:        #3A2D20;
-  --line-soft:   #2E231A;
-  --brand:       #E8A27A;
-  --primary:     #E0835A;
-  --primary-ink: #1B1510;
-  --accent:      #E6C169;
+  --bg: #1b1510;
+  --surface: #251c14;
+  --surface-alt: #2e231a;
+  --ink: #f4ecdb;
+  --ink-soft: #d9c69e;
+  --ink-muted: #9e8b73;
+  --line: #3a2d20;
+  --line-soft: #2e231a;
+  --brand: #e8a27a;
+  --primary: #e0835a;
+  --primary-ink: #1b1510;
+  --accent: #e6c169;
+  --positive: #6a9e64;
+  --danger: #e06b5e;
 }
 
 @theme inline {
   /* Superfícies */
-  --color-bg:          var(--bg);
-  --color-surface:     var(--surface);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
   --color-surface-alt: var(--surface-alt);
 
   /* Texto */
-  --color-ink:       var(--ink);
-  --color-ink-soft:  var(--ink-soft);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
   --color-ink-muted: var(--ink-muted);
 
   /* Bordas */
-  --color-line:      var(--line);
+  --color-line: var(--line);
   --color-line-soft: var(--line-soft);
 
   /* Brand */
-  --color-brand:       var(--brand);
-  --color-primary:     var(--primary);
+  --color-brand: var(--brand);
+  --color-primary: var(--primary);
   --color-primary-ink: var(--primary-ink);
-  --color-accent:      var(--accent);
-  --color-positive:    var(--positive);
-  --color-danger:      var(--danger);
+  --color-accent: var(--accent);
+  --color-positive: var(--positive);
+  --color-danger: var(--danger);
 
   /* Escala completa */
-  --color-cream-50:      #FBF6EC;
-  --color-cream-100:     #F4ECDB;
-  --color-cream-200:     #E9DCC0;
-  --color-cream-300:     #D9C69E;
-  --color-terracota-100: #F7DDCE;
-  --color-terracota-300: #E6A279;
-  --color-terracota-500: #C9683C;
-  --color-terracota-600: #B05628;
-  --color-terracota-700: #8C421E;
-  --color-mostarda-100:  #F7E4B2;
-  --color-mostarda-300:  #E6C169;
-  --color-mostarda-500:  #CE9A24;
-  --color-mostarda-600:  #A97C17;
-  --color-mostarda-700:  #7E5C10;
-  --color-tinto-300:     #C65B52;
-  --color-tinto-500:     #9E3027;
-  --color-tinto-700:     #6E1E18;
-  --color-tinto-900:     #4A140F;
-  --color-breu-700:      #3E2F22;
-  --color-breu-800:      #2A1E14;
-  --color-breu-900:      #1A120B;
-  --color-mata-500:      #456B3E;
-  --color-mata-700:      #2E4A2A;
+  --color-cream-50: #fbf6ec;
+  --color-cream-100: #f4ecdb;
+  --color-cream-200: #e9dcc0;
+  --color-cream-300: #d9c69e;
+  --color-terracota-100: #f7ddce;
+  --color-terracota-300: #e6a279;
+  --color-terracota-500: #c9683c;
+  --color-terracota-600: #b05628;
+  --color-terracota-700: #8c421e;
+  --color-mostarda-100: #f7e4b2;
+  --color-mostarda-300: #e6c169;
+  --color-mostarda-500: #ce9a24;
+  --color-mostarda-600: #a97c17;
+  --color-mostarda-700: #7e5c10;
+  --color-tinto-300: #c65b52;
+  --color-tinto-500: #9e3027;
+  --color-tinto-700: #6e1e18;
+  --color-tinto-900: #4a140f;
+  --color-breu-700: #3e2f22;
+  --color-breu-800: #2a1e14;
+  --color-breu-900: #1a120b;
+  --color-mata-500: #456b3e;
+  --color-mata-700: #2e4a2a;
 
   /* Fontes */
   --font-display: var(--font-familjen-grotesk), ui-sans-serif, system-ui, sans-serif;
-  --font-body:    var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
-  --font-mono:    var(--font-dm-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-body: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   /* Animações */
   --animate-fade-slide-up: fadeSlideUp 360ms cubic-bezier(0.2, 0.7, 0.25, 1) both;
@@ -134,10 +136,14 @@
 /* Textura kraft — uso com overlay semi-opaco sobre superfície */
 .grao {
   background-image:
-    radial-gradient(rgba(74,20,15,.08) 1px, transparent 1px),
-    radial-gradient(rgba(74,20,15,.05) 1px, transparent 1px);
-  background-size: 3px 3px, 7px 7px;
-  background-position: 0 0, 1px 2px;
+    radial-gradient(rgba(74, 20, 15, 0.08) 1px, transparent 1px),
+    radial-gradient(rgba(74, 20, 15, 0.05) 1px, transparent 1px);
+  background-size:
+    3px 3px,
+    7px 7px;
+  background-position:
+    0 0,
+    1px 2px;
 }
 
 .dark .leaflet-tile-pane {
@@ -145,6 +151,12 @@
 }
 
 @keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

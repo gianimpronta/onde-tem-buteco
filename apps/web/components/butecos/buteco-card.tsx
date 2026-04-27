@@ -26,7 +26,7 @@ export function ButecoCard({ buteco, variant }: ButecoCardProps) {
     return (
       <Link
         href={`/butecos/${buteco.slug}`}
-        className="block overflow-hidden rounded-[14px] border border-line-soft bg-white shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
+        className="block overflow-hidden rounded-[14px] border border-line-soft bg-surface shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
       >
         <div className="relative aspect-[4/2.6] w-full overflow-hidden">
           <Image
@@ -47,7 +47,7 @@ export function ButecoCard({ buteco, variant }: ButecoCardProps) {
             {buteco.nome}
           </h2>
           {buteco.petiscoNome && (
-            <p className="mt-2 font-display text-[14px] font-medium text-tinto-700">
+            <p className="mt-2 font-display text-[14px] font-medium text-brand">
               {buteco.petiscoNome}
             </p>
           )}
@@ -59,19 +59,21 @@ export function ButecoCard({ buteco, variant }: ButecoCardProps) {
   return (
     <Link
       href={`/butecos/${buteco.slug}`}
-      className="relative block overflow-hidden rounded-[14px] border border-mostarda-300 bg-mostarda-100 transition hover:-translate-y-0.5"
+      className="relative block overflow-hidden rounded-[14px] border border-mostarda-300 bg-mostarda-100 transition hover:-translate-y-0.5 dark:border-line dark:bg-surface"
     >
       <div className="grao absolute inset-0" aria-hidden />
       <div className="relative p-5">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-mostarda-700">
+        <p className="font-mono text-[11px] uppercase tracking-wide text-mostarda-700 dark:text-accent">
           {buteco.bairro ? `${buteco.bairro} · ` : ""}
           {buteco.cidade}
         </p>
-        <h2 className="mt-2 font-display text-[30px] font-bold leading-none text-tinto-700">
+        <h2 className="mt-2 font-display text-[30px] font-bold leading-none text-brand">
           {buteco.nome}
         </h2>
         {buteco.petiscoNome && (
-          <p className="mt-3 font-body text-[14px] text-breu-800">{buteco.petiscoNome}</p>
+          <p className="mt-3 font-body text-[14px] text-breu-800 dark:text-ink-soft">
+            {buteco.petiscoNome}
+          </p>
         )}
       </div>
     </Link>

@@ -87,7 +87,9 @@ test("exibe estado vazio quando nao ha resultados", async ({ page }) => {
   await page.getByRole("button", { name: "Aplicar filtros" }).click();
 
   await expect(page).toHaveURL(/q=Inexistente/);
-  await expect(page.getByRole("heading", { name: "Nenhum buteco encontrado por aqui" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Nenhum buteco encontrado por aqui" })
+  ).toBeVisible();
   await expect(page.getByRole("link", { name: "Limpar filtros" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Voltar para a home" })).toBeVisible();
 });
@@ -157,6 +159,20 @@ test("aplica o tema escuro inicial a partir da preferencia salva", async ({ page
 
   await expect(page.locator("html")).toHaveClass(/dark/);
   await expect(page.getByRole("button", { name: "Mudar para tema claro" })).toBeVisible();
+});
+
+test("logo permanece visivel no tema escuro", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("theme", "dark");
+  });
+
+  await page.goto("/");
+
+  const darkLogo = page.locator('img[src="/logo-wordmark-dark.svg"]');
+  await expect(darkLogo).toBeVisible();
+
+  const lightLogo = page.locator('img[src="/logo-wordmark.svg"]');
+  await expect(lightLogo).toBeHidden();
 });
 
 test("exibe feedback claro quando a localizacao esta indisponivel no primeiro acesso", async ({
