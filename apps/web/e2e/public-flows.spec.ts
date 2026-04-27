@@ -87,7 +87,9 @@ test("exibe estado vazio quando nao ha resultados", async ({ page }) => {
   await page.getByRole("button", { name: "Aplicar filtros" }).click();
 
   await expect(page).toHaveURL(/q=Inexistente/);
-  await expect(page.getByRole("heading", { name: "Nenhum buteco encontrado por aqui" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Nenhum buteco encontrado por aqui" })
+  ).toBeVisible();
   await expect(page.getByRole("link", { name: "Limpar filtros" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Voltar para a home" })).toBeVisible();
 });
