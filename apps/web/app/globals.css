@@ -11,8 +11,8 @@
   /* Terracota — CTA primário */
   --terracota-100: #f7ddce;
   --terracota-300: #e6a279;
-  --terracota-500: #c9683c;
-  --terracota-600: #b05628;
+  --terracota-500: #b45428;
+  --terracota-600: #9a4520;
   --terracota-700: #8c421e;
 
   /* Mostarda — acento secundário */
@@ -43,7 +43,7 @@
   --surface-alt: #fffbf2;
   --ink: var(--breu-900);
   --ink-soft: var(--breu-700);
-  --ink-muted: #7a6a58;
+  --ink-muted: #76644f;
   --line: #d9c69e;
   --line-soft: #e9dcc0;
   --brand: var(--tinto-700);

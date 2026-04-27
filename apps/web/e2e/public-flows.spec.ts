@@ -161,6 +161,20 @@ test("aplica o tema escuro inicial a partir da preferencia salva", async ({ page
   await expect(page.getByRole("button", { name: "Mudar para tema claro" })).toBeVisible();
 });
 
+test("logo permanece visivel no tema escuro", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("theme", "dark");
+  });
+
+  await page.goto("/");
+
+  const darkLogo = page.locator('img[src="/logo-wordmark-dark.svg"]');
+  await expect(darkLogo).toBeVisible();
+
+  const lightLogo = page.locator('img[src="/logo-wordmark.svg"]');
+  await expect(lightLogo).toBeHidden();
+});
+
 test("exibe feedback claro quando a localizacao esta indisponivel no primeiro acesso", async ({
   page,
 }) => {

@@ -10,7 +10,8 @@ export default async function Header() {
     <header className="w-full border-b border-line-soft bg-surface">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center">
-          <img src="/logo-wordmark.svg" height={32} alt="Onde tem buteco" className="h-8 w-auto" />
+          <img src="/logo-wordmark.svg" height={32} alt="Onde tem buteco" className="h-14 w-auto dark:hidden" />
+          <img src="/logo-wordmark-dark.svg" height={32} alt="Onde tem buteco" className="hidden h-14 w-auto dark:block" />
         </Link>
 
         <nav className="flex items-center gap-2">
