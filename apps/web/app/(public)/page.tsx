@@ -16,7 +16,7 @@ export default async function Home() {
       <section className="relative overflow-hidden rounded-3xl bg-surface p-5 sm:p-7">
         <div className="grao absolute inset-0" aria-hidden />
         <div className="relative">
-          <h1 className="font-display text-[42px] font-bold leading-tight tracking-tight text-tinto-700 sm:text-[52px]">
+          <h1 className="font-display text-[42px] font-bold leading-tight tracking-tight text-brand sm:text-[52px]">
             Descubra os botecos no mapa
           </h1>
           <p className="mt-3 max-w-2xl font-body text-[15px] leading-relaxed text-ink-soft sm:text-[17px]">
@@ -26,7 +26,7 @@ export default async function Home() {
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
             {total > 0 && (
-              <span className="inline-flex items-center rounded-full bg-mostarda-100 px-4 py-2 font-mono text-[12px] font-bold text-mostarda-700">
+              <span className="inline-flex items-center rounded-full bg-mostarda-100 px-4 py-2 font-mono text-[12px] font-bold text-mostarda-700 dark:bg-surface-alt dark:text-accent">
                 {total} botecos participando
               </span>
             )}

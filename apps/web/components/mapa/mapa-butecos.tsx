@@ -53,13 +53,13 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
   return (
     <div className="overflow-hidden rounded-[14px] border border-line-soft bg-surface-alt shadow-warm-sm">
       {erro && (
-        <div className="flex items-center gap-2 border-b border-line-soft bg-terracota-100 px-4 py-2.5 font-body text-[13px] text-tinto-700">
+        <div className="flex items-center gap-2 border-b border-line-soft bg-terracota-100 px-4 py-2.5 font-body text-[13px] text-tinto-700 dark:bg-surface-alt dark:text-danger">
           <span aria-hidden="true">⚠</span>
           {erro}
         </div>
       )}
       {coords && !erro && (
-        <div className="flex items-center gap-2 border-b border-line-soft bg-mostarda-100 px-4 py-2.5 font-body text-[13px] text-mostarda-700">
+        <div className="flex items-center gap-2 border-b border-line-soft bg-mostarda-100 px-4 py-2.5 font-body text-[13px] text-mostarda-700 dark:bg-surface-alt dark:text-accent">
           <span aria-hidden="true">📍</span>
           Usando sua localização para destacar o mapa.
         </div>
@@ -69,7 +69,7 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
           onClick={buscar}
           disabled={carregando}
           aria-label="Usar minha localização"
-          className="absolute right-3 top-3 z-[1000] flex items-center gap-1.5 rounded-full bg-surface-alt px-3 py-1.5 font-body text-[12px] font-medium text-ink-soft shadow-warm transition hover:bg-cream-100 disabled:cursor-wait disabled:opacity-70"
+          className="absolute right-3 top-3 z-[1000] flex items-center gap-1.5 rounded-full bg-surface-alt px-3 py-1.5 font-body text-[12px] font-medium text-ink-soft shadow-warm transition hover:bg-cream-100 dark:hover:bg-surface disabled:cursor-wait disabled:opacity-70"
         >
           <span aria-hidden="true">{carregando ? "⏳" : "📍"}</span>
           {carregando ? "Localizando..." : "Usar minha localização"}
@@ -94,7 +94,7 @@ export function MapaButecos({ butecos }: Readonly<MapaButecosProps>) {
                   </p>
                   <Link
                     href={`/butecos/${buteco.slug}`}
-                    className="font-body text-[13px] font-medium text-tinto-700 hover:underline"
+                    className="font-body text-[13px] font-medium text-brand hover:underline"
                   >
                     Ver detalhes
                   </Link>

@@ -16,7 +16,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-line-soft bg-white md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-line-soft bg-bg md:hidden"
       aria-label="Navegação principal"
     >
       {tabs.map(({ label, icon, href, disabled }) => {
@@ -29,8 +29,12 @@ export function BottomNav() {
             aria-current={isActive ? "page" : undefined}
             className={[
               "flex flex-1 flex-col items-center gap-1 py-3 transition",
-              isActive ? "bg-mostarda-100 text-tinto-700" : "text-ink-muted",
-              disabled ? "pointer-events-none opacity-40" : "hover:text-tinto-700",
+              isActive
+                ? "bg-mostarda-100 text-tinto-700 dark:bg-surface-alt dark:text-brand"
+                : "text-ink-muted",
+              disabled
+                ? "pointer-events-none opacity-40"
+                : "hover:text-tinto-700 dark:hover:text-brand",
             ].join(" ")}
           >
             <svg className="h-5 w-5" aria-hidden>
