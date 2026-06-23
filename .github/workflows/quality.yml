@@ -151,6 +151,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [coverage-python, coverage-typescript, e2e-typescript]
+    # PRs do dependabot rodam sem acesso aos secrets, então SONAR_TOKEN vem
+    # vazio e o scanner falha com "Project not found". Pulamos o gate nesses PRs.
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
