@@ -34,7 +34,7 @@ editados manualmente no banco — a fonte da verdade é o scraper.
 | Mapa              | Leaflet + `react-leaflet`                                            |
 | Testes (web)      | Jest 30 + Testing Library (jsdom) · Playwright + `@axe-core` (E2E)  |
 | Scraper           | Python 3.12 + BeautifulSoup + **FlareSolverr** · ruff · pytest       |
-| Toolchain (web)   | **pnpm 10.33 (obrigatório — não usar npm)** · Node 22                |
+| Toolchain (web)   | **pnpm 11.5.1 (obrigatório — não usar npm)** · Node 22              |
 | CI / Quality gate | GitHub Actions · SonarCloud                                          |
 | Hospedagem        | Vercel                                                               |
 
@@ -192,9 +192,9 @@ DATABASE_URL=<url> python main.py --skip-scrape --backfill-missing-geocodes  # s
 > Cada vez que algo "passou local e quebrou no CI" ou custou > 15 min, registre aqui
 > em uma linha: sintoma → causa → fix.
 
-- **`pnpm` only (10.33), nunca `npm`** — o lockfile é `apps/web/pnpm-lock.yaml` e há
-  `pnpm.overrides` no `package.json`. O README ainda tem passos com `npm install`/`npx`
-  (legado/inconsistente) — ignore, use pnpm.
+- **`pnpm` only (11.5.1), nunca `npm`** — o lockfile é `apps/web/pnpm-lock.yaml`;
+  settings do pnpm ficam em `apps/web/pnpm-workspace.yaml`. O README ainda tem passos
+  com `npm install`/`npx` (legado/inconsistente) — ignore, use pnpm.
 - **Prisma 7 — `url` NÃO vai no `schema.prisma`** — vai em `apps/web/prisma.config.ts`
   (`datasource.url = POSTGRES_URL_NON_POOLING`), que carrega `.env.local` via `dotenv`.
   O runtime usa driver adapter (`@prisma/adapter-pg` + `pg.Pool`) em `lib/prisma.ts`.
