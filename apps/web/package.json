@@ -2,6 +2,7 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.5.1",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -49,17 +50,5 @@
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^6"
-  },
-  "pnpm": {
-    "overrides": {
-      "@babel/core": "^7.29.6",
-      "@hono/node-server": ">=1.19.13",
-      "brace-expansion@5": ">=5.0.6",
-      "fast-uri": "^3.1.2",
-      "hono": ">=4.12.25",
-      "js-yaml": "^4.2.0",
-      "postcss": ">=8.5.10",
-      "ws": ">=8.21.0"
-    }
   }
 }
