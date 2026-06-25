@@ -5,7 +5,12 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Carimbo } from "@/components/ui/carimbo";
 import { buttonClassName } from "@/components/ui/button";
-import { E2E_AUTH_COOKIE, E2E_FAVORITOS_COOKIE, E2E_VISITAS_COOKIE } from "@/lib/detail-actions";
+import {
+  E2E_AUTH_COOKIE,
+  E2E_FAVORITOS_COOKIE,
+  E2E_VISITAS_COOKIE,
+  parseE2ECookieList,
+} from "@/lib/e2e-fixture-cookies";
 import { isE2EFixtureMode, listE2EFixtureButecosByIds } from "@/lib/public-butecos";
 
 type MinhaContaButeco = {
@@ -23,6 +28,12 @@ type FavoritoItem = {
 type VisitaItem = {
   visitadoEm: Date;
   buteco: MinhaContaButeco;
+};
+
+type AccountSectionItem = {
+  buteco: MinhaContaButeco;
+  color: "tinto" | "mostarda";
+  metadata: string;
 };
 
 type MinhaContaUser = {
@@ -47,30 +58,6 @@ function formatVisitados(count: number) {
   return `${count} ${count === 1 ? "visitado" : "visitados"}`;
 }
 
-function parseCookieList(value: string | undefined): string[] {
-  if (!value) {
-    return [];
-  }
-
-  const candidates = [value];
-
-  try {
-    candidates.push(decodeURIComponent(value));
-  } catch {}
-
-  for (const candidate of candidates) {
-    try {
-      const parsed = JSON.parse(candidate) as unknown;
-
-      if (Array.isArray(parsed)) {
-        return parsed.filter((item): item is string => typeof item === "string");
-      }
-    } catch {}
-  }
-
-  return [];
-}
-
 async function getFixtureUser(): Promise<MinhaContaUser> {
   const cookieStore = await cookies();
 
@@ -78,8 +65,8 @@ async function getFixtureUser(): Promise<MinhaContaUser> {
     redirect("/login");
   }
 
-  const favoritosIds = parseCookieList(cookieStore.get(E2E_FAVORITOS_COOKIE)?.value);
-  const visitasIds = parseCookieList(cookieStore.get(E2E_VISITAS_COOKIE)?.value);
+  const favoritosIds = parseE2ECookieList(cookieStore.get(E2E_FAVORITOS_COOKIE)?.value);
+  const visitasIds = parseE2ECookieList(cookieStore.get(E2E_VISITAS_COOKIE)?.value);
   const favoritos = listE2EFixtureButecosByIds(favoritosIds).map((buteco, index) => ({
     buteco,
     createdAt: new Date(Date.UTC(2026, 0, index + 1, 12)),
@@ -127,6 +114,16 @@ export default async function MinhaContaPage() {
   const nome = user.name ?? "buteco lover";
   const favoritos = user.favoritos;
   const visitas = user.visitas;
+  const favoritosItems = favoritos.map(({ buteco, createdAt }) => ({
+    buteco,
+    color: "mostarda" as const,
+    metadata: `Favoritado em ${dateFormatter.format(createdAt)}`,
+  }));
+  const visitasItems = visitas.map(({ buteco, visitadoEm }) => ({
+    buteco,
+    color: "tinto" as const,
+    metadata: `Visitado em ${dateFormatter.format(visitadoEm)}`,
+  }));
 
   return (
     <main className="mx-auto max-w-5xl space-y-8 px-4 py-8 pb-24">
@@ -156,57 +153,21 @@ export default async function MinhaContaPage() {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-[14px] border border-line-soft bg-surface-alt p-5 shadow-warm-sm">
-          <SectionHeader
-            title="Favoritos"
-            description="Butecos guardados para visitar, comparar ou transformar em roteiro."
-          />
-          {favoritos.length === 0 ? (
-            <EmptyState
-              title="Sua lista de favoritos está vazia"
-              description="Comece salvando os butecos que parecem bons para o seu roteiro."
-              href="/butecos"
-              action="Encontrar butecos"
-            />
-          ) : (
-            <ul className="mt-5 space-y-3">
-              {favoritos.map(({ buteco, createdAt }) => (
-                <ButecoAccountItem
-                  key={buteco.slug}
-                  buteco={buteco}
-                  color="mostarda"
-                  metadata={`Favoritado em ${dateFormatter.format(createdAt)}`}
-                />
-              ))}
-            </ul>
-          )}
-        </section>
+        <AccountButecosSection
+          title="Favoritos"
+          description="Butecos guardados para visitar, comparar ou transformar em roteiro."
+          emptyTitle="Sua lista de favoritos está vazia"
+          emptyDescription="Comece salvando os butecos que parecem bons para o seu roteiro."
+          items={favoritosItems}
+        />
 
-        <section className="rounded-[14px] border border-line-soft bg-surface-alt p-5 shadow-warm-sm">
-          <SectionHeader
-            title="Butecos que você conheceu"
-            description="Histórico dos lugares que já ganharam seu carimbo no concurso."
-          />
-          {visitas.length === 0 ? (
-            <EmptyState
-              title="Você ainda não marcou nenhum buteco como visitado"
-              description="Use o mapa para escolher o próximo carimbo do rolê."
-              href="/butecos"
-              action="Encontrar butecos"
-            />
-          ) : (
-            <ul className="mt-5 space-y-3">
-              {visitas.map(({ buteco, visitadoEm }) => (
-                <ButecoAccountItem
-                  key={buteco.slug}
-                  buteco={buteco}
-                  color="tinto"
-                  metadata={`Visitado em ${dateFormatter.format(visitadoEm)}`}
-                />
-              ))}
-            </ul>
-          )}
-        </section>
+        <AccountButecosSection
+          title="Butecos que você conheceu"
+          description="Histórico dos lugares que já ganharam seu carimbo no concurso."
+          emptyTitle="Você ainda não marcou nenhum buteco como visitado"
+          emptyDescription="Use o mapa para escolher o próximo carimbo do rolê."
+          items={visitasItems}
+        />
       </div>
     </main>
   );
@@ -227,6 +188,45 @@ function SectionHeader({ title, description }: { title: string; description: str
       <h2 className="font-display text-[20px] font-semibold text-ink">{title}</h2>
       <p className="mt-1 font-body text-[14px] leading-relaxed text-ink-soft">{description}</p>
     </div>
+  );
+}
+
+function AccountButecosSection({
+  title,
+  description,
+  emptyTitle,
+  emptyDescription,
+  items,
+}: {
+  title: string;
+  description: string;
+  emptyTitle: string;
+  emptyDescription: string;
+  items: AccountSectionItem[];
+}) {
+  return (
+    <section className="rounded-[14px] border border-line-soft bg-surface-alt p-5 shadow-warm-sm">
+      <SectionHeader title={title} description={description} />
+      {items.length === 0 ? (
+        <EmptyState
+          title={emptyTitle}
+          description={emptyDescription}
+          href="/butecos"
+          action="Encontrar butecos"
+        />
+      ) : (
+        <ul className="mt-5 space-y-3">
+          {items.map(({ buteco, color, metadata }) => (
+            <ButecoAccountItem
+              key={buteco.slug}
+              buteco={buteco}
+              color={color}
+              metadata={metadata}
+            />
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
