@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -File 'E:\\repo\\onde-tem-buteco\\.codex\\hooks\\sonar-secrets/build-scripts/pretool-secrets.ps1'",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -File 'E:\\repo\\onde-tem-buteco\\.codex\\hooks\\sonar-secrets/build-scripts/prompt-secrets.ps1'",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

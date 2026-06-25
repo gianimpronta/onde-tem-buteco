@@ -23,7 +23,7 @@ export default async function ButecosPage({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6">
-      <section className="rounded-3xl border border-line-soft bg-surface p-6">
+      <section className="rounded-[14px] border border-line-soft bg-surface p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
@@ -45,7 +45,7 @@ export default async function ButecosPage({
         </div>
       </section>
 
-      <section className="rounded-3xl border border-line-soft bg-surface p-6">
+      <section className="rounded-[14px] border border-line-soft bg-surface p-6">
         <Suspense>
           <ButecosFilterForm cidadeOptions={cidadeOptions} bairroOptions={bairroOptions} />
         </Suspense>
@@ -58,7 +58,7 @@ export default async function ButecosPage({
       </section>
 
       {butecos.length === 0 ? (
-        <section className="rounded-3xl border border-dashed border-line bg-surface-alt px-6 py-12 text-center">
+        <section className="rounded-[14px] border border-dashed border-line bg-surface-alt px-6 py-12 text-center">
           <h2 className="font-display text-[22px] font-bold text-ink">
             Nenhum buteco encontrado por aqui
           </h2>

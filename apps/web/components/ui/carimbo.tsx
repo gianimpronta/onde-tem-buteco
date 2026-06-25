@@ -7,9 +7,9 @@ type CarimboProps = {
 };
 
 const sizeConfig = {
-  lg: { dim: "w-24 h-24", text: "text-[11px]", rotate: "-rotate-6" },
-  sm: { dim: "w-14 h-14", text: "text-[9px]", rotate: "-rotate-3" },
-  xs: { dim: "w-8 h-8", text: "text-[6px]", rotate: "" },
+  lg: { dim: "w-24 h-24", border: "border-2", title: "text-[13px]", rotate: "-rotate-6" },
+  sm: { dim: "w-14 h-14", border: "border-2", title: "text-[8px]", rotate: "-rotate-3" },
+  xs: { dim: "w-8 h-8", border: "border", title: "text-[6.5px]", rotate: "" },
 };
 
 const colorConfig = {
@@ -19,22 +19,30 @@ const colorConfig = {
 };
 
 export function Carimbo({ nome, bairro, numero, size = "lg", color = "tinto" }: CarimboProps) {
-  const { dim, text, rotate } = sizeConfig[size];
+  const { dim, border, title, rotate } = sizeConfig[size];
   const showDetails = size === "lg";
   return (
     <div
       className={[
-        "relative flex flex-col items-center justify-center rounded-full border-2 font-mono text-center leading-tight",
+        "relative flex flex-col items-center justify-center rounded-full text-center leading-none",
         dim,
-        text,
+        border,
         rotate,
         colorConfig[color],
       ].join(" ")}
       aria-label={`Carimbo: ${nome}`}
     >
-      {showDetails && numero && <span className="font-bold">{numero}</span>}
-      <span className="font-semibold">{nome}</span>
-      {showDetails && bairro && <span className="opacity-70">{bairro}</span>}
+      <span
+        className="pointer-events-none absolute inset-1 rounded-full border border-dashed border-current opacity-70"
+        aria-hidden
+      />
+      <span className={["font-display font-bold tracking-tight", title].join(" ")}>{nome}</span>
+      {showDetails && bairro && (
+        <span className="mt-1 font-mono text-[8.5px] uppercase tracking-[0.15em]">{bairro}</span>
+      )}
+      {showDetails && numero && (
+        <span className="mt-1 font-mono text-[9px] opacity-75">{numero}</span>
+      )}
     </div>
   );
 }

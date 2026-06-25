@@ -16,7 +16,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-line-soft bg-bg md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-line-soft bg-surface-alt md:hidden"
       aria-label="Navegação principal"
     >
       {tabs.map(({ label, icon, href, disabled }) => {
