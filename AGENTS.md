@@ -1,347 +1,266 @@
 # AGENTS.md — onde-tem-buteco
 
-Guia de desenvolvimento para agentes de IA e colaboradores do projeto.
-Leia este arquivo inteiro antes de escrever qualquer código.
+Guia de desenvolvimento para agentes de IA e colaboradores. Leia inteiro antes de
+escrever código. Estas instruções têm prioridade sobre o comportamento padrão.
+
+> **Sincronização:** `CLAUDE.md` e `AGENTS.md` (raiz) devem estar sempre idênticos.
+> Ao alterar stack, comandos, convenções ou regras, atualize os dois na mesma entrega.
 
 ---
 
-## Visão geral do projeto
+## Visão geral
 
-**Onde Tem Buteco** é um web app que complementa o site oficial do concurso
-Comida di Buteco (comidadibuteco.com.br), preenchendo lacunas de UX como:
-mapa interativo, filtro por bairro, montagem de roteiro e conta de usuário
-com favoritos e histórico de visitas.
+**Onde Tem Buteco** é um web app fan-made que complementa o site oficial do concurso
+Comida di Buteco (comidadibuteco.com.br), preenchendo lacunas de UX: mapa interativo,
+filtro por bairro, roteiro e conta de usuário com favoritos e histórico de visitas.
 
-Os dados são obtidos exclusivamente via scraping do site oficial e nunca
-devem ser alterados manualmente no banco.
+Os dados vêm **exclusivamente** do scraper do site oficial e **nunca** devem ser
+editados manualmente no banco — a fonte da verdade é o scraper.
 
----
-
-## Repositório
-
-- **Nome:** `onde-tem-buteco`
-- **Organização:** `gianimpronta`
-- **URL:** `https://github.com/gianimpronta/onde-tem-buteco`
+- **Repo (público):** `https://github.com/gianimpronta/onde-tem-buteco` — org `gianimpronta`
+- **Branch default:** `main` · branches de trabalho `feat/...` `fix/...` a partir de `main`
 
 ---
 
 ## Stack
 
-| Camada         | Tecnologia                             |
-| -------------- | -------------------------------------- |
-| Framework      | Next.js 16 (App Router) + TypeScript   |
-| Estilização    | Tailwind CSS                           |
-| ORM            | Prisma                                 |
-| Banco de dados | Supabase Postgres                      |
-| Autenticação   | NextAuth.js v5 (Google OAuth)          |
-| Mapa           | Leaflet.js                             |
-| Scraper        | Python 3.12 + BeautifulSoup + psycopg2 |
-| CI/CD          | GitHub Actions                         |
-| Hospedagem     | Vercel                                 |
+| Camada            | Tecnologia                                                            |
+| ----------------- | -------------------------------------------------------------------- |
+| Framework         | Next.js 16 (App Router) + React 19 + TypeScript                      |
+| Estilização       | Tailwind CSS v4 (`@tailwindcss/postcss`) — sem CSS customizado       |
+| ORM               | Prisma 7 (`@prisma/client` + `@prisma/adapter-pg`)                   |
+| Banco             | Supabase Postgres (via driver adapter `pg.Pool`)                     |
+| Autenticação      | NextAuth.js v5 (Google OAuth)                                        |
+| Mapa              | Leaflet + `react-leaflet`                                            |
+| Testes (web)      | Jest 30 + Testing Library (jsdom) · Playwright + `@axe-core` (E2E)  |
+| Scraper           | Python 3.12 + BeautifulSoup + **FlareSolverr** · ruff · pytest       |
+| Toolchain (web)   | **pnpm 11.5.1 (obrigatório — não usar npm)** · Node 22              |
+| CI / Quality gate | GitHub Actions · SonarCloud                                          |
+| Hospedagem        | Vercel                                                               |
 
 ---
 
-## Estrutura do repositório
+## Comandos
+
+> Comandos do app rodam a partir de `apps/web`. Use **sempre pnpm** (nunca npm/yarn).
+
+| Comando                                                          | O que faz                                      |
+| --------------------------------------------------------------- | ---------------------------------------------- |
+| `pnpm install --frozen-lockfile`                                | Instala dependências                           |
+| `pnpm exec prisma generate`                                     | Gera o client em `app/generated/prisma/`       |
+| `pnpm dev`                                                       | Dev server (http://localhost:3000)             |
+| `pnpm build`                                                     | `prisma generate && next build` (checa tipos)  |
+| `pnpm lint`                                                      | ESLint                                          |
+| `npx prettier --write "app/**/*.{ts,tsx}" "lib/**/*.{ts,tsx}"`  | Formata TS (**não há script `format`**)        |
+| `pnpm test`                                                      | Jest (unit/componentes, jsdom)                 |
+| `pnpm test --coverage`                                          | Cobertura (TS)                                 |
+| `pnpm test:e2e:setup`                                           | `prisma generate` + instala Chromium (1ª vez)  |
+| `pnpm test:e2e`                                                 | `prisma generate && playwright test`           |
+| `pnpm exec prisma migrate dev`                                  | Cria/aplica migration em desenvolvimento       |
+
+**Antes de qualquer `git push`** (espelha o quality gate do CI) — rode e passe:
+
+1. `npx prettier --write ...` (TS) + `ruff format scraper/ && ruff check --fix scraper/` (Python) → `git diff` limpo
+2. `pnpm lint`
+3. `pnpm test` (Jest) + `pytest scraper/tests/` (Python)
+4. `pnpm test:e2e`
+
+Não fazer push com qualquer etapa falhando; ao descrever validação no PR, declare que as quatro rodaram.
+
+### Infra (gh / Vercel / Supabase)
+
+```bash
+gh auth status · gh issue view <n> · gh pr create --draft · gh run list
+vercel link · vercel env pull .env.local
+supabase link --project-ref <ref> · supabase db pull · supabase db push
+```
+
+---
+
+## Arquitetura
 
 ```
 onde-tem-buteco/
-├── apps/
-│   └── web/                          # Aplicação Next.js
-│       ├── app/
-│       │   ├── (public)/
-│       │   │   ├── page.tsx                    # Home com mapa
-│       │   │   ├── butecos/
-│       │   │   │   ├── page.tsx                # Listagem com filtros
-│       │   │   │   └── [slug]/page.tsx         # Detalhe do buteco
-│       │   ├── (auth)/
-│       │   │   ├── login/page.tsx
-│       │   │   └── cadastro/page.tsx
-│       │   ├── (private)/
-│       │   │   └── minha-conta/page.tsx        # Favoritos + histórico
-│       │   └── api/
-│       │       ├── auth/[...nextauth]/route.ts
-│       │       └── butecos/route.ts
-│       ├── components/
-│       │   ├── ui/                             # Componentes base
-│       │   ├── mapa/                           # Componentes Leaflet
-│       │   └── butecos/                        # Cards, filtros, listagem
-│       ├── lib/
-│       │   ├── prisma.ts                       # Singleton do Prisma client
-│       │   └── auth.ts                         # Configuração NextAuth
-│       └── prisma/
-│           └── schema.prisma
-└── scraper/                          # Script Python isolado
-    ├── main.py
-    ├── requirements.txt
-    └── .github/
-        └── workflows/
-            └── scraper.yml
+├── apps/web/                       # Aplicação Next.js (pnpm)
+│   ├── app/
+│   │   ├── (public)/               # Home (mapa), /butecos, /butecos/[slug]
+│   │   ├── (auth)/                 # /login, /cadastro
+│   │   ├── (private)/              # /minha-conta (favoritos + histórico)
+│   │   ├── api/                    # auth/[...nextauth], mutações
+│   │   └── generated/prisma/       # Prisma Client GERADO — não versionar, não editar
+│   ├── components/                 # ui/, mapa/ (Leaflet), butecos/
+│   ├── lib/                        # auth.ts, prisma.ts (singleton+adapter),
+│   │   │                           # buteco-actions.ts, detail-actions.ts (Server Actions),
+│   │   │                           # *-filters/-formatters, geolocalizacao, __tests__/
+│   │   └── ...
+│   ├── prisma/                     # schema.prisma + migrations/ (fonte da verdade do schema)
+│   └── prisma.config.ts            # Prisma 7: datasource.url aqui (NÃO no schema.prisma)
+└── scraper/                        # Script Python isolado (main.py, tests/, ruff.toml)
 ```
+
+Modelos do banco: `Buteco`, `User`, `Favorito`, `Visita` — ver `apps/web/prisma/schema.prisma`
+(não duplicar o schema aqui; ele é a fonte da verdade).
 
 ---
 
-## Schema do banco de dados
+## Ambiente
 
-```prisma
-model Buteco {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  nome        String
-  cidade      String
-  bairro      String?
-  endereco    String
-  telefone    String?
-  horario     String?
-  petiscoNome String?
-  petiscoDesc String?
-  fotoUrl     String?
-  lat         Float?
-  lng         Float?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+Copie `.env.example` → `.env.local` (gitignored, **nunca** commitar). Chaves e onde
+obter cada valor estão documentadas no `.env.example`.
 
-  favoritos   Favorito[]
-  visitas     Visita[]
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  image     String?
-  createdAt DateTime @default(now())
-
-  favoritos Favorito[]
-  visitas   Visita[]
-}
-
-model Favorito {
-  id        String   @id @default(cuid())
-  userId    String
-  butecoId  String
-  createdAt DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id])
-  buteco    Buteco   @relation(fields: [butecoId], references: [id])
-
-  @@unique([userId, butecoId])
-}
-
-model Visita {
-  id          String   @id @default(cuid())
-  userId      String
-  butecoId    String
-  visitadoEm DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id])
-  buteco    Buteco   @relation(fields: [butecoId], references: [id])
-
-  @@unique([userId, butecoId])
-}
-```
-
----
-
-## Variáveis de ambiente
-
-```bash
-# .env.local (nunca commitar)
-DATABASE_URL=
-NEXTAUTH_SECRET=
-NEXTAUTH_URL=
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-```
-
-O scraper usa apenas `DATABASE_URL`, injetada via GitHub Actions Secret.
-
-## Comandos úteis de infraestrutura
-
-### Vercel
-
-- `vercel link`
-- `vercel env pull .env.local`
-- `vercel pull`
-
-### Supabase
-
-- `supabase link --project-ref <project-ref>`
-- `supabase db pull`
-- `supabase db push`
-- `supabase secrets set --env-file .env.local`
-
-### GitHub
-
-- `gh auth status`
-- `gh issue view <numero>`
-- `gh issue create`
-- `gh pr create --draft`
-- `gh pr view --web`
-- `gh run list`
+- **Web:** o Prisma lê `POSTGRES_URL_NON_POOLING` (config) com fallback para
+  `POSTGRES_URL` → `POSTGRES_PRISMA_URL` → `DATABASE_URL` (ver `lib/prisma.ts`).
+  Mais `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GOOGLE_CLIENT_ID/SECRET`.
+- **Scraper:** usa apenas `DATABASE_URL`, injetada via GitHub Actions Secret.
 
 ---
 
 ## Scraper
 
-- **Fonte:** `https://comidadibuteco.com.br/butecos/`
-- **Frequência:** Toda segunda-feira às 06h (GitHub Actions cron)
-- **Estratégia:** Upsert por `slug` — nunca deletar registros existentes
-- **Rate limit:** `time.sleep(0.5)` entre requisições para respeitar o servidor
-- **Geocodificação:** Nominatim (OpenStreetMap) — gratuito, sem chave de API
-
-### Rodar manualmente
+- **Fonte:** `https://comidadibuteco.com.br/butecos/` · **Cron:** seg. 06h (GitHub Actions)
+- **Bypass Cloudflare:** o scraper usa **FlareSolverr** (sessão via `fs_create_session`),
+  não só requests/BeautifulSoup — o serviço precisa estar no ar. `test_bypass.py` /
+  workflow `test-bypass.yml` cobrem esse caminho.
+- **Estratégia:** upsert por `slug` — **nunca deletar** registros existentes.
+- **Rate limit:** `time.sleep(0.5)` entre requisições — respeitar o servidor de origem.
+- **Geocodificação:** Nominatim (OpenStreetMap), sem chave de API.
+- **Lint/format:** ruff · **Testes:** pytest (`requirements-dev.txt`, `.coveragerc`).
 
 ```bash
-cd scraper
-pip install -r requirements.txt
-DATABASE_URL=<url> python main.py
+cd scraper && pip install -r requirements.txt
+DATABASE_URL=<url> python main.py                                  # scrape + upsert
+DATABASE_URL=<url> python main.py --skip-scrape --backfill-missing-geocodes  # só lat/lng nulos
 ```
 
 ---
 
-## Convenções de código
+## Estilo de código
 
-### Geral
+- TypeScript strict, **sem `any`** · tipos explícitos, nada de funções sem tipagem.
+- Funções: 4–20 linhas. Arquivos: < 500 linhas. Uma responsabilidade por módulo (SRP).
+- Nomes específicos e únicos (evite `data`, `handler`, `Manager`); prefira nomes com
+  < 5 ocorrências no `grep`.
+- Sem duplicação — extraia lógica compartilhada. Retornos antecipados em vez de `if`s
+  aninhados (máx. 2 níveis de indentação).
+- `camelCase` (funções/vars), `PascalCase` (componentes), `kebab-case.tsx` (arquivos).
+- Mensagens de exceção incluem o valor problemático e o formato esperado.
 
-- TypeScript strict mode sempre ativado — sem `any`
-- Funções e variáveis em `camelCase`
-- Componentes React em `PascalCase`
-- Arquivos de componente em `kebab-case.tsx`
-- Sem comentários óbvios — o código deve ser autodescritivo
+### Next.js / Prisma / Tailwind
 
-### Next.js
-
-- Preferir Server Components por padrão
-- Client Components (`"use client"`) apenas quando necessário (interatividade, hooks)
-- Dados sempre buscados no servidor via Prisma — nunca expor o client do Prisma no browser
-- Rotas de API apenas para mutações (POST/DELETE de favoritos e visitas)
-
-### Prisma
-
-- Sempre usar o singleton de `lib/prisma.ts`
-- Nunca usar `prisma.$queryRaw` — usar a API do Prisma
-- Migrations via `prisma migrate dev` em desenvolvimento
-
-### Tailwind
-
-- Sem CSS customizado — usar apenas classes utilitárias do Tailwind
-- Componentes reutilizáveis extraídos para `components/ui/`
+- Server Components por padrão; `"use client"` só com interatividade/hooks.
+- Leituras: buscar no servidor via Prisma direto em Server Components — **não** criar
+  Server Action para leitura. Mutações (favoritar/visitar): Server Actions (`lib/*-actions.ts`)
+  ou Route Handler. Nunca expor o Prisma Client no browser.
+- Sempre o singleton `lib/prisma.ts`; **nunca** `prisma.$queryRaw`/SQL direto.
+- Tailwind apenas (sem CSS customizado); reusáveis em `components/ui/`.
 
 ---
 
-## Fluxo de desenvolvimento
+## Comentários
 
-### Antes de começar qualquer tarefa
+- Escreva o **PORQUÊ**, não o O QUÊ. Sem comentários óbvios — código autodescritivo.
+- Mantenha seus próprios comentários em refactors — carregam intenção e origem.
+- Docstrings em funções públicas: intenção + um exemplo. Referencie issue/SHA quando
+  uma linha existir por causa de um bug específico ou restrição upstream.
 
-1. Ler este arquivo
-2. Verificar se existe issue ou task relacionada
-3. Criar branch a partir de `main` com nome descritivo: `feat/mapa-leaflet`, `fix/filtro-bairro`
+---
+
+## Testes
+
+- **Web (unit/componentes):** Jest 30 + Testing Library (jsdom), co-localizados em
+  `lib/__tests__/` e `app/**`; mockam I/O (Prisma) — `lib/prisma.ts` fica fora da cobertura.
+- **Web (E2E):** Playwright + `@axe-core/playwright` (acessibilidade); fixtures estáveis
+  para os fluxos públicos — **não** dependem do banco real (local ou CI).
+- **Scraper:** pytest com cobertura (`scraper/tests/`).
+- Toda função nova ganha teste; toda correção de bug ganha teste de regressão.
+- F.I.R.S.T (rápidos, independentes, repetíveis, auto-validáveis, oportunos).
+- Mock de I/O externo (Prisma, `fetch`, filesystem) com **classes fake nomeadas**, não
+  stubs inline.
+
+---
+
+## Dependências
+
+- Encapsule libs de terceiros atrás de uma interface fina deste projeto — `lib/prisma.ts`
+  já faz isso (singleton + driver adapter), não espalhe o SDK do Prisma.
+- Injete dependências via parâmetro quando o consumidor precisar ser testável.
+
+---
+
+## Gotchas que mordem em CI / dev
+
+> Cada vez que algo "passou local e quebrou no CI" ou custou > 15 min, registre aqui
+> em uma linha: sintoma → causa → fix.
+
+- **`pnpm` only (11.5.1), nunca `npm`** — o lockfile é `apps/web/pnpm-lock.yaml`;
+  settings do pnpm ficam em `apps/web/pnpm-workspace.yaml`. O README ainda tem passos
+  com `npm install`/`npx` (legado/inconsistente) — ignore, use pnpm.
+- **Prisma 7 — `url` NÃO vai no `schema.prisma`** — vai em `apps/web/prisma.config.ts`
+  (`datasource.url = POSTGRES_URL_NON_POOLING`), que carrega `.env.local` via `dotenv`.
+  O runtime usa driver adapter (`@prisma/adapter-pg` + `pg.Pool`) em `lib/prisma.ts`.
+- **Prisma Client gerado em `app/generated/prisma/`** (output custom, **não versionado**) —
+  `prisma generate` é obrigatório antes de `build`/`dev`/`test:e2e`; os scripts `build` e
+  `test:e2e` já chamam. Importar de `@/app/generated/prisma/client`, **não** de `@prisma/client`.
+- **Não há script `format`** (só `format:check`) — o CI formata com
+  `npx prettier --write "app/**/*.{ts,tsx}" "lib/**/*.{ts,tsx}"` e falha no `git diff --exit-code`
+  se ficar sujo. Mesma regra Python: `ruff format` + `ruff check --fix` + git limpo.
+- **Não há script `type-check`** — a checagem de tipos vem do `pnpm build` (`next build`).
+  Para checar isolado: `npx tsc --noEmit`.
+- **CI usa Node 22 e `pnpm install --ignore-scripts`** — os testes Jest mockam o Prisma,
+  por isso `pnpm test` roda sem `prisma generate`. O README diz "Node 20+"; o CI fixa **22**.
+- **Quality gate (SonarCloud)** depende de cobertura TS + Python + E2E (workflow `quality.yml`):
+  uma das etapas falhando derruba o gate.
+- **Scraper precisa do FlareSolverr no ar** (bypass Cloudflare) — sem ele, o scrape falha
+  antes do BeautifulSoup.
+
+---
+
+## Fluxo de desenvolvimento (GitHub)
 
 ### Issues
-- Toda issue nova deve receber `labels`, `milestone` e `project`
-- Toda issue deve representar uma unidade de trabalho rastreável antes da abertura do PR
-- No project `Onde Tem Buteco`, manter apenas issues como itens visíveis
-- Pull requests não devem permanecer como itens do project; a ligação deve aparecer pela coluna `Linked pull requests` da issue
 
-### Commits
+- Toda issue recebe `labels`, `milestone` e `project`, e representa uma unidade rastreável
+  antes do PR.
+- No project `Onde Tem Buteco`, manter **apenas issues** como itens visíveis (PRs não viram
+  itens próprios — a ligação aparece em `Linked pull requests`).
+- Issues criadas por agentes de IA são atribuídas a `@gianimpronta` (inclusive ao desmembrar
+  em sub-issues).
 
-Seguir Conventional Commits:
+### Commits — Conventional Commits
 
 ```
 feat: adiciona mapa interativo com Leaflet
 fix: corrige filtro por bairro no Rio
-chore: atualiza dependências
-docs: atualiza AGENTS.md com instruções do scraper
+chore: atualiza dependências   ·   docs: atualiza CLAUDE.md
 ```
+
+- **Não** adicionar `Co-Authored-By` nos commits.
 
 ### Pull Requests
 
-- PRs pequenos e focados — uma funcionalidade por PR
-- Descrever o que foi feito e como testar
-- Todo PR deve estar vinculado à issue correspondente no corpo da descrição, preferencialmente com `Closes #numero` ou `Fixes #numero` quando o merge resolver a issue
-- Todo PR deve receber as labels, milestone e project adequados ao escopo da entrega
-- PRs complementares devem usar `Refs #numero` quando fizerem parte da mesma entrega sem encerrar a issue principal
-- Vercel cria preview deploy automático por PR
-
-### Antes de push
-
-- Sempre rodar `format`, `lint`, `test` e `e2e` antes de qualquer `git push`
-- Não fazer push com qualquer uma dessas etapas falhando
-- Ao descrever validação em PRs, incluir de forma objetiva que essas quatro etapas foram executadas
-
-### Issues
-
-- Issues criadas por agentes de IA devem ser atribuídas a `@gianimpronta` no momento da criação
-- Ao desmembrar uma issue em sub-issues, manter a atribuição em `@gianimpronta` por padrão
-- Não é necessário workflow de auto-assign enquanto esse fluxo continuar estável
-- Se o projeto passar a ter múltiplos responsáveis abrindo issues com frequência, reavaliar essa convenção
-
----
-
-## Fases do MVP
-
-### Fase 1 — Dados ✅ (base)
-
-- [ ] Setup Next.js 16 + TypeScript + Tailwind + Prisma
-- [ ] Configurar Supabase Postgres
-- [ ] Rodar scraper manualmente para popular o banco
-- [ ] Migrations iniciais
-
-### Fase 2 — Leitura
-
-- [ ] Listagem de butecos com filtro por cidade e bairro
-- [ ] Busca por nome
-- [ ] Página de detalhe do buteco
-- [ ] Mapa interativo com Leaflet
-
-### Fase 3 — Usuário
-
-- [ ] Google OAuth via NextAuth
-- [ ] Favoritar buteco
-- [ ] Marcar como visitado
-- [ ] Página "Minha Conta" com favoritos e histórico
-
-### Fase 4 — Produção
-
-- [ ] SEO básico (metadata, Open Graph, sitemap.xml)
-- [ ] Deploy na Vercel
-- [ ] Configurar GitHub Actions cron do scraper
-- [ ] Monitoramento de erros (Sentry ou Vercel Analytics)
+- Pequenos e focados — uma funcionalidade por PR; descrever o que foi feito e como testar.
+- Vincular à issue: `Closes #n`/`Fixes #n` no PR que encerra; `Refs #n` em PRs complementares.
+- Preencher `labels`, `milestone` e `project`. Vercel cria preview deploy por PR.
 
 ---
 
 ## Repositório público — cuidados
 
-Este repositório é **público**. Qualquer pessoa pode ler o código.
+Este repo é **público**. Qualquer pessoa lê o código.
 
-- Nunca commitar `.env.local`, `.env` ou qualquer arquivo com credenciais reais
-- Manter `.env.example` sempre atualizado com todas as chaves necessárias (valores vazios)
-- O scraper é visível publicamente — manter `time.sleep` e não fazer scraping agressivo
-- Este projeto é **fan-made**, sem fins comerciais. Os dados pertencem ao Comida di Buteco
-- Não incluir tokens, senhas ou URLs de banco de dados em issues, PRs ou comentários de código
-- Secrets de produção ficam **apenas** nas configurações da Vercel e nos GitHub Actions Secrets
-
----
-
-## Arquivos obrigatórios no repositório
-
-| Arquivo        | Propósito                                                               |
-| -------------- | ----------------------------------------------------------------------- |
-| `.gitignore`   | Ignorar `.env.local`, `.env`, `node_modules/`, `.next/`, `__pycache__/` |
-| `.env.example` | Documentar todas as variáveis necessárias com valores vazios            |
-| `README.md`    | Descrição, como rodar localmente, stack e créditos                      |
-| `LICENSE`      | MIT — uso livre com atribuição                                          |
-| `AGENTS.md`    | Este arquivo — guia para agentes de IA e colaboradores                  |
+- Nunca commitar `.env.local`/`.env` ou qualquer credencial — nem "temporariamente".
+- Manter `.env.example` atualizado (todas as chaves, valores vazios).
+- Scraper é visível: manter `time.sleep` e não fazer scraping agressivo.
+- Secrets de produção ficam **apenas** na Vercel e nos GitHub Actions Secrets.
+- Projeto fan-made, sem fins comerciais — os dados pertencem ao Comida di Buteco.
 
 ---
 
 ## O que NÃO fazer
 
-- Não editar dados de butecos manualmente no banco — a fonte da verdade é o scraper
-- Não usar `prisma.$queryRaw` ou SQL direto
-- Não criar CSS customizado fora do Tailwind
-- Não commitar `.env.local` ou qualquer secret
-- Não fazer scraping sem `time.sleep` — respeitar o servidor de origem
-- Não usar `any` no TypeScript
-- Não criar Server Actions para leituras — usar Server Components diretamente
-- Não incluir credenciais reais em nenhum arquivo versionado, mesmo que "temporariamente"
+- Editar dados de butecos manualmente no banco (a fonte é o scraper).
+- Usar `npm`/`yarn` no app (é pnpm) ou `prisma.$queryRaw`/SQL direto.
+- Criar CSS customizado fora do Tailwind, ou usar `any` no TypeScript.
+- Criar Server Action para **leitura** (use Server Component direto).
+- Commitar `.env.local`/secrets, ou versionar `app/generated/prisma/`.
+- Fazer scraping sem `time.sleep` — respeitar o servidor de origem.

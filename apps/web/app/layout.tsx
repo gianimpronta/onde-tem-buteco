@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Familjen_Grotesk, Inter_Tight, DM_Mono } from "next/font/google";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
@@ -72,7 +73,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <Script id="theme-script" strategy="beforeInteractive">
+          {themeScript}
+        </Script>
       </head>
       <body className="min-h-full flex flex-col bg-bg text-ink font-body">
         {children}

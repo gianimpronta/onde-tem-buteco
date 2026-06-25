@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { isValidAction } from "@/lib/buteco-actions";
 import { auth } from "@/lib/auth";
-import { E2E_AUTH_COOKIE, E2E_FAVORITOS_COOKIE, E2E_VISITAS_COOKIE } from "@/lib/detail-actions";
+import {
+  E2E_AUTH_COOKIE,
+  E2E_FAVORITOS_COOKIE,
+  E2E_VISITAS_COOKIE,
+  parseE2ECookieList,
+  toE2ECookieValue,
+} from "@/lib/e2e-fixture-cookies";
 import { prisma } from "@/lib/prisma";
 import { isE2EFixtureMode } from "@/lib/public-butecos";
 
@@ -28,33 +34,6 @@ function parseCookieHeader(cookieHeader: string | null): Map<string, string> {
   }
 
   return cookies;
-}
-
-function parseCookieList(rawValue: string | undefined): string[] {
-  if (!rawValue) {
-    return [];
-  }
-
-  const candidates = [rawValue];
-
-  try {
-    candidates.push(decodeURIComponent(rawValue));
-  } catch {}
-
-  for (const candidate of candidates) {
-    try {
-      const parsed = JSON.parse(candidate) as unknown;
-      if (Array.isArray(parsed)) {
-        return parsed.filter((item): item is string => typeof item === "string");
-      }
-    } catch {}
-  }
-
-  return [];
-}
-
-function toCookieValue(values: string[]): string {
-  return encodeURIComponent(JSON.stringify(values));
 }
 
 function buildErrorResponse(message: string, status: number) {
@@ -133,8 +112,8 @@ function buildFixtureResponse(result: {
     isVisitado: result.isVisitado,
   });
 
-  response.cookies.set(E2E_FAVORITOS_COOKIE, toCookieValue(result.favoritos), { path: "/" });
-  response.cookies.set(E2E_VISITAS_COOKIE, toCookieValue(result.visitas), { path: "/" });
+  response.cookies.set(E2E_FAVORITOS_COOKIE, toE2ECookieValue(result.favoritos), { path: "/" });
+  response.cookies.set(E2E_VISITAS_COOKIE, toE2ECookieValue(result.visitas), { path: "/" });
 
   return response;
 }
@@ -146,8 +125,8 @@ async function handleFixtureRequest(request: Request, body: ActionRequestBody) {
     return buildErrorResponse("Não autorizado", 401);
   }
 
-  const favoritos = parseCookieList(requestCookies.get(E2E_FAVORITOS_COOKIE));
-  const visitas = parseCookieList(requestCookies.get(E2E_VISITAS_COOKIE));
+  const favoritos = parseE2ECookieList(requestCookies.get(E2E_FAVORITOS_COOKIE));
+  const visitas = parseE2ECookieList(requestCookies.get(E2E_VISITAS_COOKIE));
 
   return buildFixtureResponse(applyFixtureAction(body.action, body.butecoId, favoritos, visitas));
 }

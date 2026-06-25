@@ -13,7 +13,7 @@ export default async function Home() {
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-5 sm:gap-8 sm:px-6 sm:py-8 lg:px-8">
-      <section className="relative overflow-hidden rounded-3xl bg-surface p-5 sm:p-7">
+      <section className="relative overflow-hidden rounded-[14px] bg-surface p-5 sm:p-7">
         <div className="grao absolute inset-0" aria-hidden />
         <div className="relative">
           <h1 className="font-display text-[42px] font-bold leading-tight tracking-tight text-brand sm:text-[52px]">

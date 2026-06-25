@@ -93,6 +93,29 @@ export function isE2EFixtureMode(): boolean {
   return process.env.E2E_USE_FIXTURES === "true";
 }
 
+export function listE2EFixtureButecosByIds(ids: string[]): PublicButecoListItem[] {
+  const fixturesById = new Map(e2eFixtureButecos.map((buteco) => [buteco.id, buteco]));
+
+  return ids.flatMap((id) => {
+    const buteco = fixturesById.get(id);
+
+    if (!buteco) {
+      return [];
+    }
+
+    return [
+      {
+        slug: buteco.slug,
+        nome: buteco.nome,
+        cidade: buteco.cidade,
+        bairro: buteco.bairro,
+        petiscoNome: buteco.petiscoNome,
+        fotoUrl: buteco.fotoUrl,
+      } satisfies PublicButecoListItem,
+    ];
+  });
+}
+
 function sortByName<T extends { nome: string }>(items: T[]): T[] {
   return [...items].sort((left, right) => left.nome.localeCompare(right.nome, "pt-BR"));
 }
