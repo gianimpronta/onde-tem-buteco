@@ -2,17 +2,19 @@ import { defineConfig, devices } from "@playwright/test";
 
 const port = 3000;
 const baseURL = `http://127.0.0.1:${port}`;
+const chromiumExecutablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
+  workers: 1,
   retries: process.env.CI ? 2 : 0,
   use: {
     baseURL,
     trace: "on-first-retry",
   },
   webServer: {
-    command: "pnpm exec next dev --hostname 127.0.0.1 --port 3000",
+    command: "node ./node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port 3000",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     env: {
@@ -29,6 +31,9 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
+        ...(chromiumExecutablePath
+          ? { launchOptions: { executablePath: chromiumExecutablePath } }
+          : {}),
       },
     },
   ],
