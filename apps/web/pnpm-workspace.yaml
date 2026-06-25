@@ -1,6 +1,12 @@
 packages:
   - "."
 
+allowBuilds:
+  "@prisma/engines": true
+  prisma: true
+  sharp: true
+  unrs-resolver: true
+
 overrides:
   "@babel/core": "^7.29.6"
   "@hono/node-server": ">=1.19.13"
