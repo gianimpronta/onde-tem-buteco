@@ -8,21 +8,23 @@ datasource db {
 }
 
 model Buteco {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  nome        String
-  cidade      String
-  bairro      String?
-  endereco    String
-  telefone    String?
-  horario     String?
-  petiscoNome String?
-  petiscoDesc String?
-  fotoUrl     String?
-  lat         Float?
-  lng         Float?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  nome            String
+  cidade          String
+  bairro          String?
+  endereco        String
+  telefone        String?
+  horario         String?
+  petiscoNome     String?
+  petiscoDesc     String?
+  fotoUrl         String?
+  lat             Float?
+  lng             Float?
+  notaMedia       Float    @default(0)
+  totalAvaliacoes Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   favoritos Favorito[]
   visitas   Visita[]
@@ -52,10 +54,12 @@ model Favorito {
 }
 
 model Visita {
-  id          String   @id @default(cuid())
-  userId      String
-  butecoId    String
+  id         String   @id @default(cuid())
+  userId     String
+  butecoId   String
   visitadoEm DateTime @default(now())
+  nota       Int?
+  comentario String?  @db.VarChar(500)
 
   user   User   @relation(fields: [userId], references: [id])
   buteco Buteco @relation(fields: [butecoId], references: [id])
