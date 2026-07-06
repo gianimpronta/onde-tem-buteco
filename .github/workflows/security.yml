@@ -48,7 +48,7 @@ jobs:
             --severity-level medium \
             || true
 
-      - uses: github/codeql-action/upload-sarif@9cea5827c668a1fe7165dbce6e80c3f9cf3f83ac # v3
+      - uses: github/codeql-action/upload-sarif@ae4c8d057d67a1b17026d584ad10186562334d21 # v3
         with:
           sarif_file: bandit-results.sarif
           category: bandit
@@ -124,7 +124,7 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: "0"
 
-      - uses: github/codeql-action/upload-sarif@9cea5827c668a1fe7165dbce6e80c3f9cf3f83ac # v3
+      - uses: github/codeql-action/upload-sarif@ae4c8d057d67a1b17026d584ad10186562334d21 # v3
         with:
           sarif_file: trivy-results.sarif
           category: trivy-flaresolverr
