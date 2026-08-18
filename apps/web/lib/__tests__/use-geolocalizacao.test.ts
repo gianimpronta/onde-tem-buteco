@@ -23,8 +23,10 @@ function makePosition(latitude: number, longitude: number): GeolocationPosition 
       latitude,
       longitude,
       speed: null,
+      toJSON: () => ({}),
     },
     timestamp: Date.now(),
+    toJSON: () => ({}),
   };
 }
 
