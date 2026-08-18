@@ -48,7 +48,7 @@ jest.mock("@/components/butecos/buteco-action-panel", () => ({
 
 const getButecoBySlugMock = getButecoBySlug as jest.Mock;
 const getButecoActionStateMock = getButecoActionState as jest.Mock;
-const notFoundMock = notFound as jest.Mock;
+const notFoundMock = notFound as unknown as jest.Mock;
 
 describe("ButecoPage", () => {
   beforeEach(() => {

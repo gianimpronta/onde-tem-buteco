@@ -21,7 +21,7 @@ import { buildButecoLoginHref, getButecoActionState } from "@/lib/detail-actions
 
 const cookiesMock = cookies as jest.Mock;
 const authMock = auth as jest.Mock;
-const prismaMock = prisma as {
+const prismaMock = prisma as unknown as {
   user: { findUnique: jest.Mock };
   favorito: { findUnique: jest.Mock };
   visita: { findUnique: jest.Mock };
