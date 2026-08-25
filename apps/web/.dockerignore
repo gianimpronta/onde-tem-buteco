@@ -1,0 +1,29 @@
+# Sem este arquivo, o `COPY . .` do estagio builder despeja o node_modules da
+# maquina por cima do que veio do estagio `deps`. As duas arvores se misturam e
+# o build da imagem passa a depender do estado de quem o roda.
+#
+# Na VPS nunca aparece: /srv/onde-tem-buteco nao tem node_modules, o build so
+# acontece dentro do Docker. Aparece em qualquer maquina ou runner que rode
+# `pnpm install` antes -- o `pnpm run build` dentro da imagem detecta o
+# node_modules inconsistente, decide purga-lo e aborta por nao ter TTY
+# (ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY). Foi exatamente o que quebrou a
+# primeira execucao de CI do ludotrace, que tem o mesmo formato de Dockerfile.
+node_modules
+.next
+
+# Nunca deixar segredo entrar no contexto: as connection strings entram por
+# secret mount justamente pra nao ficarem no historico da imagem, e um .env
+# solto no contexto anularia isso.
+.env
+.env.*
+
+.git
+.gitignore
+coverage
+test-results
+playwright-report
+e2e
+Dockerfile
+.dockerignore
+npm-debug.log*
+*.tsbuildinfo
