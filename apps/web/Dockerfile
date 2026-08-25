@@ -34,11 +34,16 @@ FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 RUN corepack enable
-COPY --from=builder --chown=node:node /app ./
+# So o que o standalone precisa, em vez da arvore inteira do builder.
+COPY --from=builder --chown=node:node /app/.next/standalone ./
+COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/public ./public
 # Roda como non-root (auditoria 2026-08-21). `node` (uid 1000) ja vem na
 # imagem. O runner recebe a arvore inteira do builder, entao o chown do
 # COPY cobre tudo -- inclusive .next/cache, que o `next start` precisa
 # gravavel em runtime pra ISR.
 USER node
 EXPOSE 3000
-CMD ["pnpm", "start"]
+# O standalone traz seu proprio server.js; `pnpm start` chamaria o next CLI,
+# que nao existe mais na imagem enxuta.
+CMD ["node", "server.js"]
