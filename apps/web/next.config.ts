@@ -6,8 +6,22 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  // `standalone`: o Next emite um bundle com so as dependencias rastreadas.
+  // Sem isso o runner copiava a arvore inteira do builder -- node_modules com
+  // dev deps, codigo-fonte e .next/cache -- e a imagem tinha 1.82GB.
+  output: "standalone",
+  // Necessario porque o rastreamento nao enxerga o client gerado pelo Prisma
+  // (escrito em build-time, sem import estatico).
   outputFileTracingIncludes: {
-    "*": ["./app/generated/prisma/**/*"],
+    "*": [
+      "./app/generated/prisma/**/*",
+      // Os chunks compilados referenciam @swc/helpers pelo caminho ANINHADO
+      // dentro do diretorio do next no .pnpm (link de peer dependency que o
+      // rastreamento nao segue). Sem esta linha a imagem sobe e morre com
+      // "Cannot find module .../next@.../node_modules/@swc/helpers/...".
+      // Glob no lugar da versao pra nao quebrar no proximo bump do next.
+      "./node_modules/.pnpm/next@*/node_modules/@swc/helpers/**/*",
+    ],
   },
   images: {
     remotePatterns: [
