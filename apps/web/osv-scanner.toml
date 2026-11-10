@@ -1,0 +1,5 @@
+# O osv-scanner procura este arquivo ao lado do lockfile (apps/web/pnpm-lock.yaml).
+[[IgnoredVulns]]
+id = "GHSA-gcqx-w48m-w2h4"
+ignoreUntil = 2027-02-10
+reason = "deepmerge@4.3.1 sem versão corrigida; vem só do jest-config (devDependency), não vai para produção. Reavaliar quando o jest atualizar."
